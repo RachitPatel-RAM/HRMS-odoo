@@ -131,12 +131,22 @@ exports.getWeeklyAttendanceForAll = async (req, res) => {
         // 3. Map Data
         const attMap = {}; // { empId: { date: record } }
         attendance.forEach(r => {
-            // Ensure date is YYYY-MM-DD string for key matching
+            // Ensure date is YYYY-MM-DD string for key matching (Using Local Time to align with Frontend)
             let dateStr = r.date;
             if (r.date instanceof Date) {
-                dateStr = r.date.toISOString().split('T')[0];
-            } else if (typeof r.date === 'string' && r.date.includes('T')) {
-                dateStr = r.date.split('T')[0];
+                const year = r.date.getFullYear();
+                const month = String(r.date.getMonth() + 1).padStart(2, '0');
+                const day = String(r.date.getDate()).padStart(2, '0');
+                dateStr = `${year}-${month}-${day}`;
+            } else if (typeof r.date === 'string') {
+                // Try parsing if it looks like timestamp, otherwise assume YYYY-MM-DD
+                if (r.date.includes('T') || r.date.includes(':')) {
+                    const d = new Date(r.date);
+                    const year = d.getFullYear();
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    dateStr = `${year}-${month}-${day}`;
+                }
             }
 
             if (!attMap[r.employee_id]) attMap[r.employee_id] = {};

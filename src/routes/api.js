@@ -9,9 +9,15 @@ const salaryController = require('../controllers/salaryController');
 const upload = require('../middleware/uploadMiddleware'); // Assuming upload middleware is defined here
 const { authenticate, authorize } = require('../middleware/authMiddleware');
 
+const notificationController = require('../controllers/notificationController');
+
 // Auth Routes
 // router.post('/auth/register', authController.register); // Removed (Method missing)
 router.post('/auth/login', authController.login);
+
+// Notifications
+router.get('/notifications', authenticate, notificationController.getNotifications);
+router.put('/notifications/clear', authenticate, notificationController.clearAll);
 router.post('/auth/create-hr', authenticate, authController.createHR); // New
 router.post('/auth/change-password', authenticate, authController.changePassword); // New
 router.post('/auth/send-otp', authController.sendOTP); // New
@@ -61,6 +67,7 @@ router.get('/salary/me', authenticate, salaryController.getMe);
 // Resume Routes
 const resumeController = require('../controllers/resumeController');
 router.get('/resume/me', authenticate, resumeController.getResume);
+router.get('/resume/:employeeId', authenticate, resumeController.getResumeById); // NEW
 router.put('/resume/me', authenticate, resumeController.updateResume);
 router.post('/resume/me/upload', authenticate, resumeController.uploadResumeFile);
 

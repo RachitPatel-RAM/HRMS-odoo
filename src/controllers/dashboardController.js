@@ -65,6 +65,14 @@ exports.getDashboardData = async (req, res) => {
             }
         });
 
+        // 5. Fetch Active Session for "Me" (Fix for "Not Checked In" loop if session spans days)
+        const myActiveSession = await Attendance.findOne({
+            where: {
+                employee_id: myEmployeeId,
+                check_out_time: null
+            }
+        });
+
         // 5. Build Maps for O(1) Access
         const activeAttendanceMap = new Map();
         const latestAttendanceMap = new Map(); // Store full object for "Me"
@@ -102,7 +110,16 @@ exports.getDashboardData = async (req, res) => {
             };
         });
 
-        const myAttendance = latestAttendanceMap.get(myEmployeeId);
+        let myAttendance = latestAttendanceMap.get(myEmployeeId);
+
+        // If we have an active session (possibly from yesterday), override/use it
+        if (myActiveSession) {
+            console.log('DEBUG: Found active session for user:', myActiveSession.id, 'Date:', myActiveSession.date);
+            myAttendance = myActiveSession;
+        } else {
+            console.log('DEBUG: No active session found for user.');
+        }
+        console.log('DEBUG: Sending myAttendance to frontend:', myAttendance ? { id: myAttendance.id, check_in: myAttendance.check_in_time, check_out: myAttendance.check_out_time } : 'null');
 
         const meData = {
             employeeId: myEmployeeId,

@@ -21,6 +21,18 @@ exports.getResume = async (req, res) => {
     }
 };
 
+exports.getResumeById = async (req, res) => {
+    try {
+        const { employeeId } = req.params;
+        if (!employeeId) return res.status(400).json({ message: 'Employee ID is required' });
+
+        const data = await resumeService.getResume(employeeId);
+        res.json(data);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 exports.updateResume = async (req, res) => {
     try {
         const user = await User.findByPk(req.user.id);

@@ -159,14 +159,14 @@
             </div>
 
             <!-- Summary Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full lg:w-auto flex-grow lg:justify-end">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full lg:w-auto flex-grow lg:justify-end">
                 <div
                     class="bg-white dark:bg-paper-dark border-2 border-black dark:border-white p-4 shadow-sm relative overflow-hidden group">
                     <div
                         class="absolute top-0 right-0 -mt-2 -mr-2 w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full z-0 group-hover:scale-150 transition-transform duration-500">
                     </div>
                     <div class="relative z-10 text-center">
-                        <div class="text-lg text-gray-600 dark:text-gray-300 font-bold mb-1">Count of days present</div>
+                        <div class="text-lg text-gray-600 dark:text-gray-300 font-bold mb-1">Days Present</div>
                         <div id="statPresent" class="text-3xl font-bold text-primary">--</div>
                     </div>
                 </div>
@@ -176,17 +176,29 @@
                         class="absolute top-0 right-0 -mt-2 -mr-2 w-8 h-8 bg-red-100 dark:bg-red-900 rounded-full z-0 group-hover:scale-150 transition-transform duration-500">
                     </div>
                     <div class="relative z-10 text-center">
-                        <div class="text-lg text-gray-600 dark:text-gray-300 font-bold mb-1">Leaves count</div>
+                        <div class="text-lg text-gray-600 dark:text-gray-300 font-bold mb-1">Leaves Taken</div>
                         <div id="statLeaves" class="text-3xl font-bold text-red-500">--</div>
                     </div>
                 </div>
+                <!-- New Card -->
+                <div
+                    class="bg-white dark:bg-paper-dark border-2 border-black dark:border-white p-4 shadow-sm relative overflow-hidden group">
+                    <div
+                        class="absolute top-0 right-0 -mt-2 -mr-2 w-8 h-8 bg-purple-100 dark:bg-purple-900 rounded-full z-0 group-hover:scale-150 transition-transform duration-500">
+                    </div>
+                    <div class="relative z-10 text-center">
+                        <div class="text-lg text-gray-600 dark:text-gray-300 font-bold mb-1">Days / Week</div>
+                        <div id="statConfigDays" class="text-3xl font-bold text-purple-600">--</div>
+                    </div>
+                </div>
+                <!-- Renamed Working Days to Month Work Days for clarity -->
                 <div
                     class="bg-white dark:bg-paper-dark border-2 border-black dark:border-white p-4 shadow-sm relative overflow-hidden group">
                     <div
                         class="absolute top-0 right-0 -mt-2 -mr-2 w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full z-0 group-hover:scale-150 transition-transform duration-500">
                     </div>
                     <div class="relative z-10 text-center">
-                        <div class="text-lg text-gray-600 dark:text-gray-300 font-bold mb-1">Total working days</div>
+                        <div class="text-lg text-gray-600 dark:text-gray-300 font-bold mb-1">Month Work Days</div>
                         <div id="statWorkingDays" class="text-3xl font-bold text-green-600">--</div>
                     </div>
                 </div>
@@ -343,6 +355,7 @@
             await initSystray();
             setupMonthSelect();
             loadMonth(currentDate);
+            fetchSalaryConfig();
 
             document.getElementById('prevMonthBtn').addEventListener('click', () => changeMonth(-1));
             document.getElementById('nextMonthBtn').addEventListener('click', () => changeMonth(1));
@@ -373,6 +386,25 @@
         function changeMonth(delta) {
             currentDate.setMonth(currentDate.getMonth() + delta);
             loadMonth(currentDate);
+        }
+
+        async function fetchSalaryConfig() {
+            const token = localStorage.getItem('token');
+            try {
+                // Silent fetch
+                const res = await fetch(`${API_BASE}/salary/me`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (res.ok) {
+                    const d = await res.json();
+                    if (d.exists && d.data) {
+                        const days = d.data.working_days_per_week || 5;
+                        document.getElementById('statConfigDays').innerText = days;
+                    } else {
+                        document.getElementById('statConfigDays').innerText = '5'; // Default
+                    }
+                } else {
+                    document.getElementById('statConfigDays').innerText = '5'; // Default
+                }
+            } catch (e) { console.error(e); }
         }
 
         async function loadMonth(date) {

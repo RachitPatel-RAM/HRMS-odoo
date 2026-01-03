@@ -8,10 +8,12 @@ class AttendanceService {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
+        // Check for TRULY active session (has check-in but no check-out)
         const activeSession = await Attendance.findOne({
             where: {
                 employee_id: employeeId,
-                check_out_time: null
+                check_out_time: null,
+                check_in_time: { [Op.ne]: null }
             }
         });
 
@@ -19,17 +21,37 @@ class AttendanceService {
             throw new Error('You are already checked in.');
         }
 
-        const attendance = await Attendance.create({
-            employee_id: employeeId,
-            date: today,
-            check_in_time: new Date(),
-            status: 'PRESENT',
-            lunch_duration: 1.0, // Default 1 hour policy
-            total_hours: 0,
-            overtime_hours: 0,
-            overtime_status: 'N/A',
-            extra_allocations: [] // Initialize empty array
+        // Check for Placeholder (both null) for TODAY
+        const placeholder = await Attendance.findOne({
+            where: {
+                employee_id: employeeId,
+                date: today,
+                check_in_time: null,
+                check_out_time: null
+            }
         });
+
+        let attendance;
+        if (placeholder) {
+            // Update existing placeholder
+            placeholder.check_in_time = new Date();
+            placeholder.status = 'PRESENT';
+            await placeholder.save();
+            attendance = placeholder;
+        } else {
+            // Create new
+            attendance = await Attendance.create({
+                employee_id: employeeId,
+                date: today,
+                check_in_time: new Date(),
+                status: 'PRESENT',
+                lunch_duration: 1.0,
+                total_hours: 0,
+                overtime_hours: 0,
+                overtime_status: 'N/A',
+                extra_allocations: []
+            });
+        }
 
         return attendance;
     }
@@ -220,8 +242,25 @@ class AttendanceService {
         const [year, month] = monthStr.split('-').map(Number);
 
         const startDate = new Date(year, month - 1, 1);
-        const endDate = new Date(year, month, 0); // Last day of month
+        let endDate = new Date(year, month, 0); // Last day of month
         endDate.setHours(23, 59, 59, 999);
+
+        // Logic to hide future dates:
+        // If the requested month is the CURRENT month, clamp endDate to NOW.
+        // If requested month is a FUTURE month, return empty or handle appropriately (the loop won't start if startDate > now? No, startDate is based on year/month).
+        // Let's just clamp endDate to Math.min(endDate, now).
+        const now = new Date();
+        if (endDate > now) {
+            endDate = now;
+        }
+
+        // Ensure startDate is not after endDate (e.g. if viewing future month)
+        if (startDate > endDate) {
+            return {
+                summary: { presentDays: 0, leavesCount: 0, totalWorkingDays: 0 },
+                records: []
+            };
+        }
 
         // Fetch Attendance
         const attendanceRecords = await Attendance.findAll({
@@ -231,48 +270,54 @@ class AttendanceService {
                     [Op.between]: [startDate, endDate]
                 }
             },
-            order: [['date', 'ASC']]
+            order: [['date', 'ASC'], ['check_in_time', 'ASC']]
         });
 
-        // 1. Calculate Summaries
-        // Days Present: Unique days with status PRESENT
-        const presentDays = attendanceRecords.filter(a => a.status === 'PRESENT').length;
+        // 1. Group Records by Date
+        const groupedMap = new Map(); // dateKey -> [records]
 
-        // Leaves Count (Placeholder for now, assuming Leave model exists and is synced)
-        // const leaves = await Leave.count({ where: { employee_id: employeeId, status: 'APPROVED', ...dateRange } });
+        attendanceRecords.forEach(a => {
+            const dateKey = new Date(a.date).toISOString().split('T')[0];
+            if (!groupedMap.has(dateKey)) {
+                groupedMap.set(dateKey, []);
+            }
+            groupedMap.get(dateKey).push(a);
+        });
+
+        // 2. Format Daily Records & Calculate Summaries (Simultaneously)
+        let presentDays = 0;
         const leavesCount = 0; // TODO: Integrate Leave Service
 
-        // Total Working Days (Business Days: Mon-Fri)
+        // Total Working Days
         let totalWorkingDays = 0;
         let d = new Date(startDate);
         while (d <= endDate) {
             const day = d.getDay();
-            if (day !== 0 && day !== 6) { // Exclude Sun(0) and Sat(6)
-                totalWorkingDays++;
-            }
+            if (day !== 0 && day !== 6) totalWorkingDays++;
             d.setDate(d.getDate() + 1);
         }
 
-        // 2. Format Daily Records
-        // Map by date string YYYY-MM-DD
-        const attendanceMap = new Map();
-        attendanceRecords.forEach(a => {
-            const dateKey = new Date(a.date).toISOString().split('T')[0];
-            attendanceMap.set(dateKey, a);
-        });
+        // Helper Duration Formatter
+        const formatDurationMs = (ms) => {
+            if (ms <= 0) return '0h 00m 00s';
+            const hours = Math.floor(ms / (1000 * 60 * 60));
+            const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+            return `${hours}h ${minutes}m ${seconds}s`;
+        };
 
         const dailyRecords = [];
         d = new Date(startDate);
         while (d <= endDate) {
             const dateKey = d.toISOString().split('T')[0];
-            const att = attendanceMap.get(dateKey);
+            const records = groupedMap.get(dateKey) || [];
 
             const isWeekend = (d.getDay() === 0 || d.getDay() === 6);
 
             let record = {
                 date: dateKey,
                 dayName: d.toLocaleDateString('en-US', { weekday: 'long' }),
-                displayDate: d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }), // DD/MM/YYYY
+                displayDate: d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }),
                 checkIn: '-',
                 checkOut: '-',
                 workHours: '-',
@@ -281,30 +326,102 @@ class AttendanceService {
                 isHighlight: false
             };
 
-            if (att) {
-                record.status = att.status;
-                if (att.check_in_time) {
-                    record.checkIn = new Date(att.check_in_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }); // 10:00
-                }
-                if (att.check_out_time) {
-                    record.checkOut = new Date(att.check_out_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }); // 19:00
+            if (records.length > 0) {
+                // Determine raw status first
+                const isRawPresent = records.some(r => r.status === 'PRESENT');
+                record.status = isRawPresent ? 'PRESENT' : records[0].status;
+
+                // Aggregate Logic
+                // Check In = First Check In
+                // Check Out = Last Check Out (if multiple sessions, this shows range span? Or should we show last session's checkout?)
+                // User asked for "Real Data". Showing First In and Last Out represents the "Work Day Span".
+
+                const firstRecord = records[0];
+                const lastRecord = records[records.length - 1];
+
+                if (firstRecord.check_in_time) {
+                    record.checkIn = new Date(firstRecord.check_in_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
                 }
 
-                // Format Work Hours (float to Xh Ym)
-                if (att.total_hours > 0) {
-                    const h = Math.floor(att.total_hours);
-                    const m = Math.round((att.total_hours - h) * 60);
-                    record.workHours = `${h}h ${m}m`;
+                // Show Last Check Out ONLY if it exists. If last record is active (null checkout), show '-' or maybe 'Ongoing'?
+                if (lastRecord.check_out_time) {
+                    record.checkOut = new Date(lastRecord.check_out_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                } else if (records.length > 1) {
+                    // If last record is ongoing, but previous had checkouts.
+                    // It's tricky. Let's show '-' if currently checked in.
                 }
 
-                // Format Extra Hours
-                if (att.overtime_hours > 0) {
-                    const h = Math.floor(att.overtime_hours);
-                    const m = Math.round((att.overtime_hours - h) * 60);
-                    record.extraHours = `${h}h ${m}m`;
+                // Sum Work Hours and Extra Hours
+                let totalWorkMs = 0;
+                let totalOtMs = 0;
+                let hasActiveSession = false;
+
+                records.forEach(r => {
+                    if (r.check_in_time && r.check_out_time) {
+                        totalWorkMs += (new Date(r.check_out_time) - new Date(r.check_in_time));
+                    } else if (r.check_in_time && !r.check_out_time) {
+                        hasActiveSession = true;
+                    }
+
+                    if (r.overtime_hours > 0) {
+                        totalOtMs += (r.overtime_hours * 60 * 60 * 1000); // OT is stored as hours float
+                    }
+                });
+
+                record.workHours = formatDurationMs(totalWorkMs);
+                if (hasActiveSession) {
+                    record.workHours += ' (Active)';
+                }
+
+                if (totalOtMs > 0) {
+                    record.extraHours = formatDurationMs(totalOtMs);
                     record.isHighlight = true;
                 } else {
-                    record.extraHours = '0h 00m';
+                    record.extraHours = '0h 00m 00s';
+                }
+
+                // Minimum Hours Logic
+                // Threshold: 2 Hours (configurable). If less than this, treat as Absent for count.
+                // Or maybe Half Day? For now, User implies strict "Short" is Absent.
+                // 1 Min / 1 Hr mention => Let's use 2 Hours as a safe "Attendance" marker.
+                const MIN_PRESENT_MS = 2 * 60 * 60 * 1000;
+
+                if (totalWorkMs >= MIN_PRESENT_MS) {
+                    // Count as Present
+                    presentDays++;
+                } else {
+                    // Mark visual status as Absent/Short if not minimal duration?
+                    // Or keep 'PRESENT' in DB but NOT count it? 
+                    // User said "count as absent only". So display ABSENT.
+
+                    // Exception: If current day is TODAY and still active, don't mark absent yet?
+                    // The 'hasActiveSession' flag helps.
+                    const isToday = (dateKey === new Date().toISOString().split('T')[0]);
+
+                    if (!hasActiveSession) {
+                        // Session closed and shorts -> ABSENT
+                        record.status = 'ABSENT';
+                        record.workHours += ' (Short)';
+                    } else {
+                        // Current/Active session < Threshold: Don't count yet, but display 'PRESENT' (or 'ONGOING')?
+                        // Usually 'PRESENT' means "Has checked in".
+                        // If we strictly follow user: "count as absent only".
+                        // Let's not increment presentDays yet. And show status as 'SHORT' or 'PRESENT'?
+                        // Let's keep status PRESENT in UI if active, but NOT count it in summary.
+
+                        // Wait, if it's today and active, we effectively don't count it as a "Full Present Day" yet?
+                        // Or do we? "Projected Earnings" depends on this.
+                        // Better to be conservative: only count COMPLETED significant days or SUBSTANTIAL active days.
+                        // Taking a stricter approach: Only `totalWorkMs >= Threshold` increments `presentDays`.
+                        // Visual status:
+                        if (totalWorkMs < MIN_PRESENT_MS) {
+                            // record.status = 'SHORT'; // Maybe confusing.
+                            // Let's leave visual status as PRESENT (checked in) but just NOT count it in summary.
+                            // User asked: "how we can say that employee is present is count as absent only".
+                            // They want the STATUS to be ABSENT likely.
+                            if (!hasActiveSession) record.status = 'ABSENT';
+                        }
+                    }
                 }
             }
 
@@ -312,17 +429,28 @@ class AttendanceService {
             d.setDate(d.getDate() + 1);
         }
 
+        // Calculate Total Extra Hours for Summary (in decimal hours)
+        const totalExtraHours = dailyRecords.reduce((acc, r) => {
+            if (r.extraHours && r.extraHours !== '-' && r.extraHours !== '0h 00m 00s') {
+                const parts = r.extraHours.match(/(\d+)h (\d+)m (\d+)s/);
+                if (parts) {
+                    const h = parseInt(parts[1]);
+                    const m = parseInt(parts[2]);
+                    const s = parseInt(parts[3]);
+                    return acc + h + (m / 60) + (s / 3600);
+                }
+            }
+            return acc;
+        }, 0);
+
         return {
             summary: {
                 presentDays,
                 leavesCount,
-                totalWorkingDays
+                totalWorkingDays,
+                totalExtraHours: parseFloat(totalExtraHours.toFixed(2))
             },
-            records: dailyRecords.reverse() // Newest first? User design shows ascending. Let's keep ascending. Wait, usually logs are desc. Reference table shows ascending? 28/10, 29/10... Ascending.
-                .reverse() // Original was Ascending logic, reverse makes it Descending? 
-            // Logic above build Ascending. Reference UI shows Ascending (28, 29, 30).
-            // Let's return Ascending.
-            // Actually, `dailyRecords` is built start->end. So it IS ascending.
+            records: dailyRecords // Now returning Ascending (1st to 31st) as built
         };
     }
 }

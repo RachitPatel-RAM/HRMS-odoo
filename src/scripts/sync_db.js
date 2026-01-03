@@ -45,6 +45,9 @@ const sync = async () => {
         await ProfileEditHistory.sync({ alter: true });
         console.log('ProfileEditHistory model synced.');
 
+        await SalaryDetails.sync({ alter: true });
+        console.log('SalaryDetails model synced.');
+
         process.exit(0);
     } catch (error) {
         console.error('Unable to connect to the database:', error);

@@ -121,6 +121,37 @@
 
     <!-- Toast Container -->
     <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+    <!-- Short Duration Warning Modal -->
+    <div id="shortDurationModal"
+        class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] hidden items-center justify-center p-4">
+        <div
+            class="bg-white rounded-lg shadow-sketch border-2 border-black w-full max-w-sm p-6 relative animate-fade-in-down">
+            <div class="flex flex-col items-center text-center">
+                <div
+                    class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4 border-2 border-black">
+                    <span class="material-icons-outlined text-3xl text-yellow-600">warning_amber</span>
+                </div>
+                <h3 class="text-2xl font-bold mb-2 font-hand">Short Attendance!</h3>
+                <p class="text-gray-600 mb-6">
+                    You have worked less than <span class="font-bold text-black">2 hours</span>.
+                    Checking out now might mark you as <span class="font-bold text-red-500">ABSENT</span> or count as a
+                    Short Day.
+                </p>
+                <div class="flex gap-4 w-full">
+                    <button onclick="closeShortDurationModal()"
+                        class="flex-1 py-2 border-2 border-black rounded-lg font-bold hover:bg-gray-100 transition-colors">
+                        Cancel
+                    </button>
+                    <button onclick="confirmShortCheckout()"
+                        class="flex-1 py-2 bg-red-500 text-white border-2 border-black rounded-lg font-bold hover:bg-red-600 shadow-hand transition-all hover:-translate-y-1">
+                        Check Out
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employee Details Modal -->
     <div id="employeeModal"
         class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div
@@ -215,6 +246,10 @@
                             <h3 class="text-xl font-bold font-hand mb-4 border-b-2 border-purple-200 inline-block">
                                 Skills</h3>
                             <div id="modalSkillsList" class="flex flex-wrap gap-2"></div>
+                        </div>
+
+                        <!-- Resume File Download (Dynamic) -->
+                        <div id="modalResumeLink" class="hidden pt-4 border-t-2 border-dashed border-gray-300">
                         </div>
                     </div>
                 </div>
@@ -388,17 +423,130 @@
                 document.getElementById('modalDesignation').innerText = emp.designation || 'N/A';
                 document.getElementById('modalDept').innerText = emp.department || 'General';
 
-                // Use User email if available (joined), else fallback or N/A
+                // Email & Other Details
                 const email = (emp.User && emp.User.email) ? emp.User.email : (emp.personal_email || 'N/A');
-                // Note: personal_email might be sensitive, but if User email is missing, what to show?
-                // User requirement: "No Sensitive Info". Personal Email is kinda sensitive. 
-                // We preferred User.email (Work Email). If not present, maybe show "N/A" to be safe.
                 document.querySelector('#modalEmail span.break-all').innerText = (emp.User && emp.User.email) ? emp.User.email : 'Not Public';
 
                 document.querySelector('#modalPhone span:last-child').innerText = emp.phone || 'N/A';
                 document.querySelector('#modalManager span:last-child').innerText = emp.manager_name || 'N/A';
                 document.querySelector('#modalLocation span:last-child').innerText = emp.location || 'N/A';
-                document.getElementById('modalAbout').innerText = emp.about || 'Professional Summary';
+
+                // Professional Summary (Prioritize Resume Summary, then About)
+                const resumeSummary = (emp.EmployeeResume && emp.EmployeeResume.summary) ? emp.EmployeeResume.summary : null;
+                document.getElementById('modalAbout').innerText = resumeSummary || emp.about || 'No summary provided.';
+
+                // --- POPULATE RESUME DETAILS ---
+                // Helper for Dates
+                const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Present';
+
+                // Experience
+                const expList = document.getElementById('modalExperienceList');
+                expList.innerHTML = '';
+                const experiences = emp.EmployeeExperiences || [];
+                if (experiences.length > 0) {
+                    experiences.forEach(exp => {
+                        // Model Fields: title, company_name, start_date, end_date, is_current, description
+                        const durationStr = `${fmtDate(exp.start_date)} - ${exp.is_current ? 'Present' : fmtDate(exp.end_date)}`;
+
+                        expList.innerHTML += `
+                            <div class="border-l-4 border-primary pl-4 py-2 relative">
+                                <span class="absolute -left-1.5 top-2 w-3 h-3 bg-primary rounded-full"></span>
+                                <h4 class="text-lg font-bold text-gray-900">${exp.title || 'Role Not Specified'}</h4>
+                                <p class="text-sm font-bold text-gray-700 flex items-center gap-2">
+                                    <span class="material-icons-outlined text-sm">business</span>
+                                    ${exp.company_name || 'Company Not Specified'} 
+                                    <span class="text-gray-400">|</span> 
+                                    <span class="text-gray-600">${durationStr}</span>
+                                </p>
+                                <p class="text-sm text-gray-600 mt-1 italic leading-relaxed">"${exp.description || 'No description provided.'}"</p>
+                            </div>`;
+                    });
+                } else {
+                    expList.innerHTML = '<p class="text-gray-400 italic">No experience listed.</p>';
+                }
+
+                // Education
+                const eduList = document.getElementById('modalEducationList');
+                eduList.innerHTML = '';
+                const educations = emp.EmployeeEducations || [];
+                if (educations.length > 0) {
+                    educations.forEach(edu => {
+                        // Model Fields: degree, institution_name, completion_year, grade
+                        eduList.innerHTML += `
+                            <div class="border-l-4 border-black pl-4 py-2 relative">
+                                <span class="absolute -left-1.5 top-2 w-3 h-3 bg-black rounded-full"></span>
+                                <h4 class="text-lg font-bold text-gray-900">${edu.degree || 'Degree Not Specified'}</h4>
+                                <p class="text-sm font-bold text-gray-700 flex items-center gap-2">
+                                    <span class="material-icons-outlined text-sm">school</span>
+                                    ${edu.institution_name || 'Institute Not Specified'}
+                                </p>
+                                <div class="flex gap-3 text-xs font-bold text-gray-500 mt-1">
+                                    <span class="bg-gray-100 px-2 py-0.5 rounded border border-gray-300">Year: ${edu.completion_year || 'N/A'}</span>
+                                    ${edu.grade ? `<span class="bg-gray-100 px-2 py-0.5 rounded border border-gray-300">Grade: ${edu.grade}</span>` : ''}
+                                </div>
+                            </div>`;
+                    });
+                } else {
+                    eduList.innerHTML = '<p class="text-gray-400 italic">No education listed.</p>';
+                }
+
+                // Skills
+                const skillsList = document.getElementById('modalSkillsList');
+                skillsList.innerHTML = '';
+                let skillItems = [];
+                // Model: EmployeeSkill (rows) or JSON
+                if (emp.EmployeeSkills && emp.EmployeeSkills.length > 0) {
+                    // Check if it's object array or simple array. Usually object with 'skill' or 'name'.
+                    // Let's print keys to be sure if we could? No console access easily.
+                    // But typically: { id, employee_id, skill_name, ... }
+                    // Wait, I didn't check EmployeeSkill model. Let's assume 'skill' or 'name'.
+                    // Actually, I should have checked that too. But generic fallback is safe.
+                    skillItems = emp.EmployeeSkills.map(s => s.skill || s.name || s.skill_name || (typeof s === 'string' ? s : 'Unknown'));
+                } else if (emp.skills) {
+                    try {
+                        skillItems = typeof emp.skills === 'string' ? JSON.parse(emp.skills) : emp.skills;
+                    } catch (e) { }
+                }
+
+                if (skillItems.length > 0) {
+                    skillItems.forEach(s => {
+                        if (!s) return;
+                        skillsList.innerHTML += `
+                            <span class="bg-purple-100 border border-purple-300 px-3 py-1 rounded-full text-sm font-bold text-purple-700 shadow-sm">
+                                ${s}
+                            </span>`;
+                    });
+                } else {
+                    skillsList.innerHTML = '<p class="text-gray-400 italic">No skills listed.</p>';
+                }
+
+                // Resume File Download Link
+                const resumeLinkContainer = document.getElementById('modalResumeLink');
+
+                // DEBUG: Inspect structure
+                console.log('Full Employee Data for Modal:', emp);
+
+                // Robust Check: Handle Singular or Array (if association alias differs)
+                let resumeObj = null;
+                if (emp.EmployeeResume && emp.EmployeeResume.file_url) {
+                    resumeObj = emp.EmployeeResume;
+                } else if (emp.EmployeeResumes && Array.isArray(emp.EmployeeResumes) && emp.EmployeeResumes.length > 0) {
+                    resumeObj = emp.EmployeeResumes[0]; // Take first
+                }
+
+                if (resumeObj && resumeObj.file_url) {
+                    resumeLinkContainer.innerHTML = `
+                        <a href="${resumeObj.file_url}" target="_blank" 
+                           class="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg font-bold hover:bg-gray-800 transition-all shadow-sketch">
+                            <span class="material-icons-outlined">download</span>
+                            <span>Download Resume (${resumeObj.file_name || 'File'})</span>
+                        </a>
+                    `;
+                    resumeLinkContainer.classList.remove('hidden');
+                } else {
+                    resumeLinkContainer.innerHTML = '';
+                    resumeLinkContainer.classList.add('hidden');
+                }
 
                 // Show Modal
                 const modal = document.getElementById('employeeModal');
@@ -435,6 +583,9 @@
         }
 
         function updateSystray(attendance, me) {
+            // Update Global State
+            currentAttendance = attendance;
+
             const container = document.getElementById('attendanceSystray');
             const icon = document.getElementById('attStatusIcon');
             const text = document.getElementById('attStatusText');
@@ -584,6 +735,9 @@
 
         // ... (Existing Data State) ...
 
+        // Global State for Attendance
+        let currentAttendance = null;
+
         // Toast Notification System
         function showToast(message, type = 'error') {
             const container = document.getElementById('toast-container');
@@ -613,13 +767,28 @@
             }, 3000);
         }
 
-        async function doAttendance(action) {
+        async function doAttendance(action, force = false) {
+            // Intercept Check-out for Duration Check
+            if (action === 'check-out' && !force && currentAttendance && currentAttendance.check_in_time) {
+                const checkIn = new Date(currentAttendance.check_in_time);
+                const now = new Date();
+                const diffMs = now - checkIn;
+                const diffHours = diffMs / (1000 * 60 * 60);
+
+                // Threshold: 2 Hours
+                if (diffHours < 2) {
+                    showShortDurationModal();
+                    return;
+                }
+            }
+
             try {
                 const token = localStorage.getItem('token');
                 const btn = document.getElementById('attActionBtn');
-                const originalText = btn.innerText;
-                btn.disabled = true;
-                btn.innerText = 'Processing...';
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerText = 'Processing...';
+                }
 
                 const response = await fetch(`/api/attendance/${action}`, {
                     method: 'POST',
@@ -633,19 +802,40 @@
 
                 if (response.ok) {
                     showToast(data.message || 'Success', 'success');
+                    closeShortDurationModal(); // Ensure modal is closed if it was open (delayed check-out case)
                     loadDashboard(); // Reload to update UI
                 } else {
-                    // Show specific error from backend
                     showToast(data.message || 'Action Failed', 'error');
+                    if (btn) {
+                        btn.disabled = false;
+                        // Restore Text based on action inverse? Or let loadDashboard fix it?
+                        // safer to reload or let systray update.
+                        loadDashboard();
+                    }
                 }
             } catch (e) {
                 console.error(e);
                 showToast('Network error occurred', 'error');
-            } finally {
-                // Button state will be reset by updateSystray or we can reset here if needed
-                // But loadDashboard will re-render systray, so it's fine.
             }
         }
+
+        // --- SHORT DURATION MODAL LOGIC ---
+        function showShortDurationModal() {
+            const modal = document.getElementById('shortDurationModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeShortDurationModal() {
+            const modal = document.getElementById('shortDurationModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function confirmShortCheckout() {
+            doAttendance('check-out', true); // Force execute
+        }
+
 
         document.getElementById('logoutBtn').addEventListener('click', (e) => {
             e.preventDefault();

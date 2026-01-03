@@ -92,7 +92,7 @@ const SalaryDetails = sequelize.define('SalaryDetails', {
     },
     // Metadata
     last_updated_by: {
-        type: DataTypes.INTEGER, // User ID of Admin/HR
+        type: DataTypes.UUID, // Changed from INTEGER to match User.id
         allowNull: true
     }
 }, {

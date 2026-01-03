@@ -28,6 +28,7 @@
                         sketch: "4px 4px 0px 0px rgba(0,0,0,1)",
                         "sketch-sm": "2px 2px 0px 0px rgba(0,0,0,1)",
                         hand: "4px 4px 0px 0px rgba(0,0,0,1)",
+                        "sketchy": "2px 2px 0px 0px rgba(0,0,0,1)", // Added for consistency
                     }
                 }
             }
@@ -221,94 +222,7 @@
             class="bg-white border-2 border-black border-t-0 rounded-b-lg rounded-tr-lg p-6 md:p-10 shadow-sketch relative z-0">
             <!-- Private Info Form (Default) -->
             <form id="detailsForm" class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <!-- ... Existing Form Content kept as is in next blocks ... -->
 
-                <!-- Salary Info Section (Hidden by Default) -->
-                <div id="salarySection" class="hidden relative z-10 animate-fade-in space-y-8 font-hand text-xl">
-                    <div
-                        class="bg-purple-50 border-2 border-black rounded-lg p-6 flex flex-col md:flex-row justify-between items-center gap-6 shadow-sketch-sm">
-                        <div class="text-center md:text-left">
-                            <h3 class="text-2xl font-bold text-primary mb-1">Fixed Wage</h3>
-                            <p class="text-gray-600 text-sm">Monthly Gross Breakdown</p>
-                        </div>
-                        <div class="flex gap-8 text-center">
-                            <div>
-                                <p class="text-gray-500 text-sm mb-1 uppercase tracking-wide font-display">Monthly</p>
-                                <p id="salMonthly" class="text-3xl font-bold">₹ --</p>
-                            </div>
-                            <div>
-                                <p class="text-gray-500 text-sm mb-1 uppercase tracking-wide font-display">Yearly</p>
-                                <p id="salYearly" class="text-3xl font-bold">₹ --</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="salaryContent">
-                        <!-- Component Table -->
-                        <div class="border-2 border-black rounded-lg overflow-hidden">
-                            <div class="bg-gray-50 border-b-2 border-black p-4">
-                                <h4 class="font-bold text-xl">Salary Breakdown</h4>
-                            </div>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left border-collapse">
-                                    <thead class="bg-white border-b-2 border-black">
-                                        <tr>
-                                            <th class="p-4 border-r border-black/10">Component</th>
-                                            <th class="p-4 border-r border-black/10">Computation</th>
-                                            <th class="p-4 text-right">Amount</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="salComponentsBody" class="bg-white">
-                                        <!-- JS Populated -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- Deductions -->
-                        <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div class="border-2 border-black rounded-lg p-6 relative">
-                                <h4 class="font-bold text-xl mb-4 border-b-2 border-black/10 pb-2">Deductions (Employee)
-                                </h4>
-                                <div class="space-y-4">
-                                    <div class="flex justify-between items-center">
-                                        <span>Provident Fund (12%)</span>
-                                        <span id="valPFEmployee" class="font-bold">₹ --</span>
-                                    </div>
-                                    <div class="flex justify-between items-center text-gray-500 text-sm">
-                                        <span>Employer Contribution</span>
-                                        <span id="valPFEmployer">₹ --</span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span>Professional Tax</span>
-                                        <span id="valPT" class="font-bold">₹ --</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Salary Summary -->
-                            <div
-                                class="bg-primary/5 border-2 border-black rounded-lg p-6 flex flex-col justify-center gap-4">
-                                <div class="flex justify-between items-center text-gray-600">
-                                    <span>Gross Salary</span>
-                                    <span id="valGross" class="font-bold font-mono">₹ --</span>
-                                </div>
-                                <div class="flex justify-between items-center text-red-500">
-                                    <span>Total Deductions</span>
-                                    <span id="valDeductions" class="font-bold font-mono">- ₹ --</span>
-                                </div>
-                                <div class="h-px bg-black my-2"></div>
-                                <div class="flex justify-between items-center text-2xl font-bold text-primary">
-                                    <span>Net Pay</span>
-                                    <span id="valNetPay" class="font-mono">₹ --</span>
-                                </div>
-                                <p class="text-center text-xs text-gray-400 mt-2 font-display">
-                                    * This information is managed by HR and is read-only.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div class="space-y-6">
                     <div>
                         <label class="block text-xl mb-2 text-black font-bold">Date of Birth</label>
@@ -416,7 +330,7 @@
             </form>
         </section>
 
-        <!-- SALARY SECTION -->
+        <!--SALARY SECTION-->
         <section id="salarySection"
             class="bg-white dark:bg-card-dark rounded-lg shadow-sketch border-2 border-black p-6 md:p-8 hidden">
             <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
@@ -426,33 +340,36 @@
 
             <div id="salaryContent">
                 <!-- Wage Summary -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-purple-50 border-2 border-purple-200 rounded-lg p-6 text-center">
+                        <p class="text-gray-600 text-lg font-bold">Projected (This Month)</p>
+                        <p id="salProjected" class="text-4xl font-bold text-purple-700 mt-2">₹ --</p>
+                        <p id="salDays" class="text-sm text-gray-500 mt-1">Based on -- days</p>
+                    </div>
                     <div class="bg-green-50 border-2 border-green-200 rounded-lg p-6 text-center">
                         <p class="text-gray-600 text-lg font-bold">Monthly Wage</p>
                         <p id="salMonthly" class="text-4xl font-bold text-green-700 mt-2">₹ --</p>
                     </div>
                     <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 text-center">
-                        <p class="text-gray-600 text-lg font-bold">Annual CTC</p>
+                        <p class="text-gray-600 text-lg font-bold flex items-center justify-center gap-2">
+                            Annual CTC
+                            <button class="text-blue-400 hover:text-blue-600 transition-colors focus:outline-none"
+                                onclick="event.stopPropagation(); showTooltip(event, 'Annual CTC', 'Annual CTC (Cost to Company) means the total annual expense a company incurs for an employee, including their basic salary, allowances (like HRA, travel), bonuses, employer\'s contributions (Provident Fund, gratuity, insurance), and other perks')"
+                                onmouseenter="showTooltip(event, 'Annual CTC', 'Annual CTC (Cost to Company) means the total annual expense a company incurs for an employee, including their basic salary, allowances (like HRA, travel), bonuses, employer\'s contributions (Provident Fund, gratuity, insurance), and other perks')"
+                                onmouseleave="hideTooltip()">
+                                <span
+                                    class="material-icons text-sm border-2 border-current rounded-full w-5 h-5 flex items-center justify-center">info</span>
+                            </button>
+                        </p>
                         <p id="salYearly" class="text-4xl font-bold text-blue-700 mt-2">₹ --</p>
                     </div>
                 </div>
 
-                <!-- Earnings Table -->
+                <!-- Earnings -->
                 <div class="mb-8">
                     <h3 class="text-xl font-bold mb-4 border-b-2 border-black/10 pb-2">Earnings</h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead>
-                                <tr class="bg-gray-100 text-gray-600 uppercase text-sm">
-                                    <th class="py-3 px-4 rounded-tl-lg">Component</th>
-                                    <th class="py-3 px-4">Type</th>
-                                    <th class="py-3 px-4 text-right rounded-tr-lg">Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody id="salComponentsBody">
-                                <!-- JS Populated -->
-                            </tbody>
-                        </table>
+                    <div id="salaryBreakdown" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- JS Populated -->
                     </div>
                 </div>
 
@@ -494,7 +411,7 @@
             </div>
         </section>
 
-        <!-- RESUME SECTION -->
+        <!--RESUME SECTION-->
         <section id="resumeSection"
             class="bg-white dark:bg-card-dark rounded-lg shadow-sketch border-2 border-black p-6 md:p-8 hidden space-y-8">
             <h2 class="text-3xl font-bold flex items-center gap-3">
@@ -590,9 +507,54 @@
         © 2026 odoo HRMS - All Right Reserved.
     </footer>
 
+    <!--Tooltip Template(Hidden)-->
+    <div id="tooltipTemplate"
+        class="hidden absolute z-50 w-64 p-4 bg-white border-2 border-black rounded-lg shadow-sketchy text-sm font-hand transition-opacity duration-200 pointer-events-none opacity-0">
+        <h4 class="font-bold border-b border-black mb-1 pb-1 text-primary">Info</h4>
+        <p class="text-gray-700 leading-snug"></p>
+    </div>
+
     <script>
+        // Tooltip Logic
+        function showTooltip(e, title, text) {
+            const el = document.getElementById('tooltipTemplate');
+            el.querySelector('h4').innerText = title;
+            el.querySelector('p').innerText = text;
+            el.classList.remove('hidden');
+
+            // Allow layout calc
+            requestAnimationFrame(() => {
+                el.classList.remove('opacity-0');
+                const rect = e.target.getBoundingClientRect();
+                const tooltipRect = el.getBoundingClientRect();
+
+                let top = rect.top - tooltipRect.height - 10 + window.scrollY;
+                let left = rect.left - (tooltipRect.width / 2) + (rect.width / 2) + window.scrollX;
+
+                // Mobile adjustment
+                if (left < 10) left = 10;
+                if (left + tooltipRect.width > window.innerWidth) left = window.innerWidth - tooltipRect.width - 10;
+
+                el.style.top = `${top}px`;
+                el.style.left = `${left}px`;
+            });
+        }
+
+        function hideTooltip() {
+            const el = document.getElementById('tooltipTemplate');
+            el.classList.add('opacity-0');
+            setTimeout(() => el.classList.add('hidden'), 200);
+        }
+
         const API_BASE = '/api';
         let currentProfile = {};
+        let resumeData = {
+            experiences: [],
+            educations: [],
+            skills: [],
+            certifications: [],
+            summary: ''
+        };
 
         async function fetchProfile() {
             const token = localStorage.getItem('token');
@@ -638,6 +600,17 @@
             document.getElementById('inputDepartment').value = data.department || '';
             document.getElementById('inputManager').value = data.manager_name || '';
             document.getElementById('inputLocation').value = data.location || '';
+
+            // Sync Resume Data
+            resumeData.experiences = data.experiences || [];
+            resumeData.educations = data.educations || [];
+            resumeData.skills = data.skills || [];
+            resumeData.certifications = data.certifications || [];
+            resumeData.summary = data.summary || '';
+            document.getElementById('resumeSummary').value = resumeData.summary;
+
+            // Initial Render of Resume if tab is active (or just prep it)
+            if (typeof renderResume === 'function') renderResume();
 
             // Image
             const avatarUrl = data.profile_picture || "https://ui-avatars.com/api/?name=" + encodeURIComponent(fullName || 'User');
@@ -826,12 +799,6 @@
         }
 
         /* --- Resume Logic --- */
-        let resumeData = {
-            experiences: [],
-            educations: [],
-            skills: [],
-            certifications: []
-        };
 
         async function fetchResume() {
             const token = localStorage.getItem('token');
@@ -889,31 +856,6 @@
             });
         }
 
-        function renderExperienceItem(exp, index) {
-            return `
-                <div class="border-2 border-black rounded-lg p-4 bg-gray-50 flex justify-between items-start relative group">
-                    <div>
-                        <h4 class="font-bold text-lg">${exp.title}</h4>
-                        <p class="text-primary font-bold">${exp.company_name}</p>
-                        <p class="text-sm text-gray-500">${exp.start_date} - ${exp.end_date || 'Present'}</p>
-                        <p class="mt-2 text-gray-700">${exp.description || ''}</p>
-                    </div>
-                    <button class="delete-btn text-red-500 font-bold opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity" data-type="experiences" data-index="${index}">
-                        <span class="material-icons-outlined">delete</span>
-                    </button>
-                    <!-- Inputs hidden or could be editable. For simplicity, we just render view and use add to add new.
-                         Ideally we would bind inputs to these values for editing. 
-                         Let's keep it simple: Add Item opens a modal/prompt? 
-                         OR better: Render as Inputs directly since user wants to edit. -->
-                 </div>
-            `;
-        }
-
-        // Re-thinking: The requirement allows "manage/update". Rendering static text makes editing hard.
-        // Let's render INPUTS for everything? Or just keep it as JSON state manipulation.
-        // Given complexity, let's render Input Fields directly in the list so they can type.
-        // Wait, "Delete" removes from ARRAY. "Save" sends entire array.
-
         function removeItem(type, index) {
             resumeData[type].splice(index, 1);
             renderResume();
@@ -921,79 +863,107 @@
 
         function renderExperienceItem(exp, index) {
             return `
-                <div class="border-2 border-black rounded-lg p-4 bg-gray-50 space-y-3 relative">
-                    <button class="delete-btn absolute top-2 right-2 text-red-500" data-type="experiences" data-index="${index}"><span class="material-icons-outlined">delete</span></button>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase">Job Title</label>
-                            <input type="text" value="${exp.title}" placeholder="e.g. Software Engineer" class="bg-white border text-lg p-2 rounded w-full" onchange="updateItem('experiences', ${index}, 'title', this.value)">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase">Company</label>
-                            <input type="text" value="${exp.company_name}" placeholder="e.g. Google" class="bg-white border text-lg p-2 rounded w-full" onchange="updateItem('experiences', ${index}, 'company_name', this.value)">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase">Start Date</label>
-                            <input type="date" value="${exp.start_date}" class="bg-white border p-2 rounded w-full" onchange="updateItem('experiences', ${index}, 'start_date', this.value)">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase">End Date</label>
-                            <input type="date" value="${exp.end_date}" class="bg-white border p-2 rounded w-full" onchange="updateItem('experiences', ${index}, 'end_date', this.value)">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase">Description</label>
-                        <textarea placeholder="Brief description of your role..." rows="2" class="w-full bg-white border p-2 rounded" onchange="updateItem('experiences', ${index}, 'description', this.value)">${exp.description || ''}</textarea>
-                    </div>
-                </div>
-             `;
+    <div class="border-2 border-black rounded-lg p-4 bg-gray-50 space-y-3 relative">
+        <button class="delete-btn absolute top-2 right-2 text-red-500" data-type="experiences"
+            data-index="${index}"><span class="material-icons-outlined">delete</span></button>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase">Job Title</label>
+                <input type="text" value="${exp.title}" placeholder="e.g. Software Engineer"
+                    class="bg-white border text-lg p-2 rounded w-full"
+                    onchange="updateItem('experiences', ${index}, 'title', this.value)">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase">Company</label>
+                <input type="text" value="${exp.company_name}" placeholder="e.g. Google"
+                    class="bg-white border text-lg p-2 rounded w-full"
+                    onchange="updateItem('experiences', ${index}, 'company_name', this.value)">
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase">Start Date</label>
+                <input type="date" value="${exp.start_date}" class="bg-white border p-2 rounded w-full"
+                    onchange="updateItem('experiences', ${index}, 'start_date', this.value)">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase">End Date</label>
+                <input type="date" value="${exp.end_date}" class="bg-white border p-2 rounded w-full"
+                    onchange="updateItem('experiences', ${index}, 'end_date', this.value)">
+            </div>
+        </div>
+        <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase">Description</label>
+            <textarea placeholder="Brief description of your role..." rows="2"
+                class="w-full bg-white border p-2 rounded"
+                onchange="updateItem('experiences', ${index}, 'description', this.value)">${exp.description || ''}</textarea>
+        </div>
+    </div>
+    `;
         }
 
         function renderEducationItem(edu, index) {
             return `
-                <div class="border-2 border-black rounded-lg p-4 bg-gray-50 space-y-3 relative">
-                     <button class="delete-btn absolute top-2 right-2 text-red-500" data-type="educations" data-index="${index}"><span class="material-icons-outlined">delete</span></button>
-                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" value="${edu.degree}" placeholder="Degree" class="bg-white border text-lg p-2 rounded w-full" onchange="updateItem('educations', ${index}, 'degree', this.value)">
-                        <input type="text" value="${edu.institution_name}" placeholder="Institution" class="bg-white border text-lg p-2 rounded w-full" onchange="updateItem('educations', ${index}, 'institution_name', this.value)">
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <input type="number" value="${edu.completion_year}" placeholder="Year" class="bg-white border p-2 rounded w-full" onchange="updateItem('educations', ${index}, 'completion_year', this.value)">
-                        <input type="text" value="${edu.grade || ''}" placeholder="Grade/Percentage" class="bg-white border p-2 rounded w-full" onchange="updateItem('educations', ${index}, 'grade', this.value)">
-                    </div>
-                </div>
-             `;
+    <div class="border-2 border-black rounded-lg p-4 bg-gray-50 space-y-3 relative">
+        <button class="delete-btn absolute top-2 right-2 text-red-500" data-type="educations"
+            data-index="${index}"><span class="material-icons-outlined">delete</span></button>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input type="text" value="${edu.degree}" placeholder="Degree"
+                class="bg-white border text-lg p-2 rounded w-full"
+                onchange="updateItem('educations', ${index}, 'degree', this.value)">
+            <input type="text" value="${edu.institution_name}" placeholder="Institution"
+                class="bg-white border text-lg p-2 rounded w-full"
+                onchange="updateItem('educations', ${index}, 'institution_name', this.value)">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <input type="number" value="${edu.completion_year}" placeholder="Year"
+                class="bg-white border p-2 rounded w-full"
+                onchange="updateItem('educations', ${index}, 'completion_year', this.value)">
+            <input type="text" value="${edu.grade || ''}" placeholder="Grade/Percentage"
+                class="bg-white border p-2 rounded w-full"
+                onchange="updateItem('educations', ${index}, 'grade', this.value)">
+        </div>
+    </div>
+    `;
         }
 
         function renderSkillItem(skill, index) {
             return `
-                 <div class="border-2 border-black rounded-full px-4 py-2 bg-purple-100 flex items-center gap-2 shadow-sm">
-                     <input type="text" value="${skill.skill_name}" class="bg-transparent border-b border-black w-32 font-bold focus:outline-none placeholder-gray-500" placeholder="Skill Name" onchange="updateItem('skills', ${index}, 'skill_name', this.value)">
-                     <select class="bg-transparent text-sm font-medium focus:outline-none cursor-pointer" onchange="updateItem('skills', ${index}, 'proficiency', this.value)">
-                        <option value="Beginner" ${skill.proficiency === 'Beginner' ? 'selected' : ''}>Beginner</option>
-                        <option value="Intermediate" ${skill.proficiency === 'Intermediate' ? 'selected' : ''}>Intermediate</option>
-                        <option value="Advanced" ${skill.proficiency === 'Advanced' ? 'selected' : ''}>Advanced</option>
-                     </select>
-                     <button class="delete-btn text-red-500 hover:text-red-700 ml-1" data-type="skills" data-index="${index}">
-                        <span class="material-icons-outlined text-lg">close</span>
-                     </button>
-                 </div>
-             `;
+    <div class="border-2 border-black rounded-full px-4 py-2 bg-purple-100 flex items-center gap-2 shadow-sm">
+        <input type="text" value="${skill.skill_name}"
+            class="bg-transparent border-b border-black w-32 font-bold focus:outline-none placeholder-gray-500"
+            placeholder="Skill Name" onchange="updateItem('skills', ${index}, 'skill_name', this.value)">
+        <select class="bg-transparent text-sm font-medium focus:outline-none cursor-pointer"
+            onchange="updateItem('skills', ${index}, 'proficiency', this.value)">
+            <option value="Beginner" ${skill.proficiency === 'Beginner' ? 'selected' : ''}>Beginner</option>
+            <option value="Intermediate" ${skill.proficiency === 'Intermediate' ? 'selected' : ''}>Intermediate</option>
+            <option value="Advanced" ${skill.proficiency === 'Advanced' ? 'selected' : ''}>Advanced</option>
+        </select>
+        <button class="delete-btn text-red-500 hover:text-red-700 ml-1" data-type="skills" data-index="${index}">
+            <span class="material-icons-outlined text-lg">close</span>
+        </button>
+    </div>
+    `;
         }
 
         function renderCertItem(cert, index) {
             return `
-                 <div class="border-2 border-black rounded-lg p-4 bg-gray-50 space-y-2 relative">
-                     <button class="delete-btn absolute top-2 right-2 text-red-500" data-type="certifications" data-index="${index}"><span class="material-icons-outlined">delete</span></button>
-                     <input type="text" value="${cert.certification_name}" placeholder="Certificate Name" class="font-bold bg-white border p-1 rounded w-full" onchange="updateItem('certifications', ${index}, 'certification_name', this.value)">
-                     <div class="grid grid-cols-2 gap-2">
-                        <input type="text" value="${cert.organization || ''}" placeholder="Issuing Org" class="bg-white border p-1 rounded w-full" onchange="updateItem('certifications', ${index}, 'organization', this.value)">
-                        <input type="number" value="${cert.year || ''}" placeholder="Year" class="bg-white border p-1 rounded w-full" onchange="updateItem('certifications', ${index}, 'year', this.value)">
-                     </div>
-                 </div>
-            `;
+    <div class="border-2 border-black rounded-lg p-4 bg-gray-50 space-y-2 relative">
+        <button class="delete-btn absolute top-2 right-2 text-red-500" data-type="certifications"
+            data-index="${index}"><span class="material-icons-outlined">delete</span></button>
+        <input type="text" value="${cert.certification_name}" placeholder="Certificate Name"
+            class="font-bold bg-white border p-1 rounded w-full"
+            onchange="updateItem('certifications', ${index}, 'certification_name', this.value)">
+        <div class="grid grid-cols-2 gap-2">
+            <input type="text" value="${cert.organization || ''}" placeholder="Issuing Org"
+                class="bg-white border p-1 rounded w-full"
+                onchange="updateItem('certifications', ${index}, 'organization', this.value)">
+            <input type="number" value="${cert.year || ''}" placeholder="Year"
+                class="bg-white border p-1 rounded w-full"
+                onchange="updateItem('certifications', ${index}, 'year', this.value)">
+        </div>
+    </div>
+    `;
         }
 
         window.updateItem = function (type, index, field, value) {
@@ -1110,77 +1080,207 @@
         async function fetchSalary() {
             const token = localStorage.getItem('token');
             try {
-                const res = await fetch(`${API_BASE}/salary/me`, {
+                // Fetch Salary
+                const resSal = await fetch(`${API_BASE}/salary/me`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
-                if (!res.ok) {
-                    if (res.status === 404) {
-                        document.getElementById('salaryContent').innerHTML = '<div class="text-center p-8 bg-gray-50 border-2 border-black border-dashed rounded-lg"><p class="text-xl font-bold">Salary information not available yet.</p><p class="text-sm text-gray-500">Contact HR to update your records.</p></div>';
+                // Fetch Attendance for Projection
+                const now = new Date();
+                const monthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+                const resAtt = await fetch(`${API_BASE}/attendance/me?month=${monthStr}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!resSal.ok) {
+                    if (resSal.status === 404) {
+                        document.getElementById('salaryContent').innerHTML = `<div
+                        class="text-center p-8 bg-gray-50 border-2 border-black border-dashed rounded-lg">
+                        <p class="text-xl font-bold">Salary information not available yet.</p>
+                        <p class="text-sm text-gray-500">Contact HR to update your records.</p>
+                    </div>`;
                         return;
                     }
                     throw new Error('Failed to load salary');
                 }
 
-                const data = await res.json();
-                renderSalary(data);
+                const salData = await resSal.json();
+                const attData = resAtt.ok ? await resAtt.json() : null;
+
+                renderSalary(salData, attData);
             } catch (e) {
                 console.error(e);
-                document.getElementById('salaryContent').innerHTML = '<p class="text-center text-red-500 text-xl">Error loading salary info. Please contact HR.</p>';
+                document.getElementById('salaryContent').innerHTML = `<p class="text-center text-red-500 text-xl">Error loading
+                salary info. Please contact HR.</p>`;
             }
         }
 
-        function renderSalary(wrapper) {
-            if (!wrapper || !wrapper.exists || !wrapper.data) {
+        function renderSalary(salaryInfo, attendanceData) {
+            if (!salaryInfo || !salaryInfo.exists || !salaryInfo.data) {
                 document.getElementById('salaryContent').innerHTML = '<p class="text-center p-4">Salary details not found.</p>';
                 return;
             }
-            const data = wrapper.data; // Extract actual data
+            const data = salaryInfo.data; // Raw SalaryDetails model
+            const wage = parseFloat(data.monthly_wage || 0);
 
             // Populate Wage Summary
-            document.getElementById('salMonthly').innerText = '₹ ' + parseFloat(data.wage).toLocaleString('en-IN');
-            document.getElementById('salYearly').innerText = '₹ ' + (parseFloat(data.wage) * 12).toLocaleString('en-IN');
+            document.getElementById('salMonthly').innerText = '₹ ' + wage.toLocaleString('en-IN');
+            document.getElementById('salYearly').innerText = '₹ ' + (wage * 12).toLocaleString('en-IN');
+
+            // Projected Earnings Calc
+            if (attendanceData && attendanceData.summary) {
+                const daysPresent = attendanceData.summary.presentDays || 0;
+                const extraHours = attendanceData.summary.totalExtraHours || 0;
+
+                // Keeping User's logic: (Wage/30) * Present
+                const startDayRate = wage / 30;
+                const baseEarnings = startDayRate * daysPresent;
+
+                // Performance Bonus (Extra Hours)
+                // Rate: Pro-rata hourly rate based on wage?
+                // Assumption: 8 hours work day.
+                const hourlyRate = (wage / 30) / 8;
+                const perfBonus = extraHours * hourlyRate;
+
+                const totalProjected = baseEarnings + perfBonus;
+
+                // HTML Injection
+                let projCard = document.getElementById('projectedCard');
+                if (projCard) {
+                    projCard.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <h4 class="text-xl font-bold font-hand">Projected (This Month)</h4>
+                        <span class="material-icons text-purple-600">trending_up</span>
+                    </div>
+
+                    <div class="text-4xl font-bold mb-2">₹${Math.round(totalProjected).toLocaleString('en-IN')}</div>
+
+                    <div class="space-y-1 text-sm text-gray-500 font-bold">
+                        <div class="flex justify-between">
+                            <span>Days Present:</span>
+                            <span>${daysPresent}</span>
+                        </div>
+                         <div class="flex justify-between text-green-600">
+                            <span>Perf. Bonus (${extraHours}h):</span>
+                            <span>+₹${Math.round(perfBonus).toLocaleString('en-IN')}</span>
+                        </div>
+                        <div class="flex justify-between border-t border-dashed border-gray-300 pt-1 mt-1">
+                            <span>Base Earnings:</span>
+                            <span>₹${Math.round(baseEarnings).toLocaleString('en-IN')}</span>
+                        </div>
+                    </div>
+                `;
+                } else {
+                    // Fallback if projectedCard doesn't exist, update salProjected and salDays as before
+                    document.getElementById('salProjected').innerText = '₹ ' + totalProjected.toLocaleString('en-IN');
+                    document.getElementById('salDays').innerText = `Based on ${daysPresent} days present and ${extraHours} extra hours`;
+                }
+            } else {
+                document.getElementById('salProjected').innerText = '₹ 0';
+                document.getElementById('salDays').innerText = 'No attendance data';
+            }
+
+            // Helper to Calc Value
+            const calc = (mode, val) => {
+                const v = parseFloat(val || 0);
+                return mode === 'Percentage' ? (wage * (v / 100)) : v;
+            };
+
+            const basic = calc(data.basic_mode, data.basic_value);
+            const hra = calc(data.hra_mode, data.hra_value);
+            const std = calc(data.std_allowance_mode, data.std_allowance_value);
+            const bonus = calc(data.bonus_mode, data.bonus_value);
+            const lta = calc(data.lta_mode, data.lta_value);
+
+            const basicVal = parseFloat(data.basic_value || 0);
+            const basicMode = data.basic_mode;
+            const basicCalc = calc(basicMode, basicVal);
+
+            const hraVal = parseFloat(data.hra_value || 0);
+            const hraMode = data.hra_mode;
+            const hraCalc = calc(hraMode, hraVal);
+
+            const stdVal = parseFloat(data.std_allowance_value || 0);
+            const stdMode = data.std_allowance_mode;
+            const stdCalc = calc(stdMode, stdVal);
+
+            const bonusVal = parseFloat(data.bonus_value || 0);
+            const bonusMode = data.bonus_mode;
+            const bonusCalc = calc(bonusMode, bonusVal);
+
+            const ltaVal = parseFloat(data.lta_value || 0);
+            const ltaMode = data.lta_mode;
+            const ltaCalc = calc(ltaMode, ltaVal);
+
+            const totalUsed = basicCalc + hraCalc + stdCalc + bonusCalc + ltaCalc;
+            const fixedAllowance = wage - totalUsed; // Balancing figure
 
             // Components Table
             const tbody = document.getElementById('salComponentsBody');
-            tbody.innerHTML = '';
-
-            const comps = [
-                { name: 'Basic Salary', type: 'Earnings', val: data.basic_salary },
-                { name: 'HRA', type: 'Earnings', val: data.hra },
-                { name: 'Standard Allowance', type: 'Earnings', val: data.standard_allowance },
-                { name: 'Performance Bonus', type: 'Earnings', val: data.performance_bonus },
-                { name: 'LTA', type: 'Earnings', val: data.lta },
-                { name: 'Fixed Allowance', type: 'Balancing Component', val: data.fixed_allowance },
+            // Components Setup
+            const components = [
+                { key: 'Basic', label: 'Basic Salary', val: basicVal, mode: basicMode, desc: 'The base income. Usually 40-50% of CTC. Fully taxable.' },
+                { key: 'HRA', label: 'HRA (House Rent Allowance)', val: hraVal, mode: hraMode, desc: 'Allowance for rental expenses. Tax exemption available under section 10(13A).' },
+                { key: 'Std', label: 'Standard Allowance', val: stdVal, mode: stdMode, desc: 'Flat deduction of ₹50,000 allowed for all salaried employees.' },
+                { key: 'Bonus', label: 'Performance Bonus', val: bonusVal, mode: bonusMode, desc: 'Additional compensation based on performance metrics.' },
+                { key: 'LTA', label: 'LTA (Leave Travel Allowance)', val: ltaVal, mode: ltaMode, desc: 'Allowance for travel within India while on leave. Tax exempt twice in 4 years.' },
+                { key: 'Fixed', label: 'Special Allowance', val: Math.max(0, fixedAllowance), mode: 'Fixed', desc: 'Balancing component to match the total CTC.' }
             ];
 
-            let gross = 0;
-            comps.forEach(c => {
-                const val = parseFloat(c.val || 0);
-                gross += val;
-                const row = `
-                    <tr class="border-b border-black/10 hover:bg-purple-50 transition-colors">
-                        <td class="py-3 px-4 font-bold">${c.name}</td>
-                        <td class="py-3 px-4 text-gray-600">${c.type}</td>
-                        <td class="py-3 px-4 text-right font-mono text-lg font-bold">₹ ${val.toLocaleString('en-IN')}</td>
-                    </tr>
-                 `;
-                tbody.insertAdjacentHTML('beforeend', row);
+            const breakdownEl = document.getElementById('salaryBreakdown');
+            breakdownEl.innerHTML = ''; // Clear
+
+            components.forEach(c => {
+                const displayVal = c.key === 'Fixed'
+                    ? formatCurrency(c.val)
+                    : (c.mode === 'Percentage' ? `${c.val}% of Basic` : formatCurrency(c.val));
+
+                const calcVal = c.key === 'Basic' ? basicCalc
+                    : c.key === 'HRA' ? hraCalc
+                        : c.key === 'Std' ? stdCalc
+                            : c.key === 'Bonus' ? bonusCalc
+                                : c.key === 'LTA' ? ltaCalc
+                                    : Math.max(0, fixedAllowance);
+
+                const html = `
+    <div
+        class="p-4 border-2 border-black rounded-lg shadow-sketchy bg-white relative group hover:border-primary transition-all">
+        <div class="flex justify-between items-start mb-2">
+            <label class="font-bold text-lg flex items-center gap-2">
+                ${c.label}
+                <button class="text-gray-400 hover:text-primary transition-colors focus:outline-none"
+                    onclick="event.stopPropagation(); showTooltip(event, '${c.key}', '${c.desc}')"
+                    onmouseenter="showTooltip(event, '${c.key}', '${c.desc}')" onmouseleave="hideTooltip()">
+                    <span
+                        class="material-icons text-sm border-2 border-current rounded-full w-5 h-5 flex items-center justify-center">info</span>
+                </button>
+            </label>
+            <span class="text-sm font-bold bg-gray-100 px-2 py-1 rounded border border-black/20">${c.mode ===
+                        'Percentage' ? '%' : 'FIX'}</span>
+        </div>
+        <div class="flex justify-between items-end">
+            <div class="text-sm text-gray-500 font-hand">${displayVal}</div>
+            <div class="text-xl font-bold font-mono text-primary">${formatCurrency(calcVal)}</div>
+        </div>
+    </div>`;
+                breakdownEl.insertAdjacentHTML('beforeend', html);
             });
 
-            // Deductions
-            const pfEmp = parseFloat(data.pf_employee || 0);
-            const pt = parseFloat(data.professional_tax || 0);
-            const totalDeductions = pfEmp + pt;
 
+            // Deductions
+            // Logic: PF is usually 12% of Basic, but using fixed 0 for now as per current data availability
+            const pfEmp = 0;
+            const pfEmplr = 0;
+            const pt = 0;
+            const totalDeductions = pfEmp + pt;
             document.getElementById('valPFEmployee').innerText = '₹ ' + pfEmp.toLocaleString('en-IN');
-            document.getElementById('valPFEmployer').innerText = '₹ ' + parseFloat(data.pf_employer || 0).toLocaleString('en-IN');
+            document.getElementById('valPFEmployer').innerText = '₹ ' + pfEmplr.toLocaleString('en-IN');
             document.getElementById('valPT').innerText = '₹ ' + pt.toLocaleString('en-IN');
 
             // Footer
-            const netPay = gross - totalDeductions;
+            const netPay = wage - totalDeductions; // Gross is effectively Wage
 
-            document.getElementById('valGross').innerText = '₹ ' + gross.toLocaleString('en-IN');
+            document.getElementById('valGross').innerText = '₹ ' + wage.toLocaleString('en-IN');
             document.getElementById('valDeductions').innerText = '₹ ' + totalDeductions.toLocaleString('en-IN');
             document.getElementById('valNetPay').innerText = '₹ ' + netPay.toLocaleString('en-IN');
         }
@@ -1190,6 +1290,10 @@
             mobileMenuBtn.addEventListener('click', () => {
                 document.getElementById('mobileMenu').classList.toggle('hidden');
             });
+        }
+
+        function formatCurrency(val) {
+            return '₹ ' + (val || 0).toLocaleString('en-IN');
         }
 
         fetchProfile();

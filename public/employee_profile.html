@@ -93,40 +93,78 @@
 </head>
 
 <body class="bg-white text-black transition-colors duration-300">
-    <nav class="border-b-2 border-black bg-white px-6 py-4 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between">
+    <header id="mainHeader" class="sticky top-0 z-50 bg-white border-b-2 border-black px-6 py-2 shadow-md relative">
+        <!-- Default Navbar (Employee) -->
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between" id="defaultNavContent">
             <div class="flex items-center space-x-2 cursor-pointer" id="navLogoBtn">
                 <div
                     class="w-10 h-10 bg-[#7B61FF] rounded-lg flex items-center justify-center text-white font-bold text-xl border-2 border-black transform -rotate-2">
-                    <img src="/assets/logg_odooHRMS.png" alt="Odoo"
-                        class="w-8 h-8 object-contain filter brightness-0 invert">
+                    HR
                 </div>
-                <span class="text-2xl font-bold tracking-wide">Odoo HRMS</span>
+                <span class="text-xl font-bold tracking-tight">Odoo HRMS</span>
             </div>
-            <div class="hidden md:flex items-center space-x-8 text-xl">
-                <a id="navEmployeesBtn"
-                    class="hover:text-primary hover:underline decoration-wavy decoration-2 underline-offset-4 transition-colors"
-                    href="#">Employees</a>
-                <a class="hover:text-primary hover:underline decoration-wavy decoration-2 underline-offset-4 transition-colors"
-                    href="/attendance.html">Attendance</a>
-                <a class="hover:text-primary hover:underline decoration-wavy decoration-2 underline-offset-4 transition-colors"
-                    href="/timeoff.html">Time Off</a>
+
+            <!-- Common Mobile Menu Button -->
+            <button id="mobileMenuBtn" class="md:hidden p-2 text-gray-600 hover:text-black focus:outline-none">
+                <span class="material-icons-outlined text-3xl">menu</span>
+            </button>
+
+            <!-- Employee Nav Links -->
+            <div class="hidden md:flex items-center space-x-8" id="navbarLinks">
+                <a href="/dashboard.html"
+                    class="font-bold text-lg hover:text-[#7B61FF] transition-colors relative group">
+                    Dashboard
+                    <span
+                        class="absolute bottom-0 left-0 w-full h-0.5 bg-[#7B61FF] transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
+                </a>
+                <a href="/attendance.html"
+                    class="font-bold text-lg hover:text-[#7B61FF] transition-colors relative group">
+                    Attendance
+                    <span
+                        class="absolute bottom-0 left-0 w-full h-0.5 bg-[#7B61FF] transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
+                </a>
+                <a href="/leaves.html" class="font-bold text-lg hover:text-[#7B61FF] transition-colors relative group">
+                    Leaves
+                    <span
+                        class="absolute bottom-0 left-0 w-full h-0.5 bg-[#7B61FF] transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
+                </a>
+                <a href="/salary.html" class="font-bold text-lg hover:text-[#7B61FF] transition-colors relative group">
+                    Salary
+                    <span
+                        class="absolute bottom-0 left-0 w-full h-0.5 bg-[#7B61FF] transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
+                </a>
             </div>
-            <div class="flex items-center space-x-4">
-                <button class="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                    <span class="material-icons">notifications</span>
+
+            <!-- User Menu -->
+            <div class="hidden md:flex items-center space-x-4">
+                <button class="relative p-2 rounded-full hover:bg-gray-100 transition-colors">
+                    <span class="material-icons-outlined text-2xl text-gray-600">notifications</span>
+                    <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border border-white"></span>
                 </button>
-                <button id="logoutBtn" class="p-2 rounded-full hover:bg-gray-100 transition-colors text-red-600"
-                    title="Logout">
-                    <span class="material-icons">logout</span>
-                </button>
-                <div class="w-10 h-10 rounded-full border-2 border-black overflow-hidden bg-gray-200">
-                    <img id="navAvatar" alt="Profile Avatar" class="w-full h-full object-cover"
-                        src="https://ui-avatars.com/api/?name=User&background=random" />
+
+                <div class="relative group">
+                    <button class="flex items-center space-x-2 focus:outline-none">
+                        <div class="w-10 h-10 rounded-full bg-gray-200 border-2 border-black overflow-hidden relative">
+                            <img id="headerAvatar" src="https://ui-avatars.com/api/?name=User&background=random"
+                                class="w-full h-full object-cover">
+                        </div>
+                    </button>
+                    <!-- Dropdown -->
+                    <div
+                        class="absolute right-0 mt-2 w-48 bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] py-1 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all z-50">
+                        <a href="/profile.html"
+                            class="block px-4 py-2 text-sm font-bold hover:bg-purple-50 transition-colors">My
+                            Profile</a>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <button id="logoutBtn"
+                            class="block w-full text-left px-4 py-2 text-sm font-bold text-red-600 hover:bg-red-50 transition-colors">
+                            Sign Out
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </nav>
+    </header>
     <main class="max-w-7xl mx-auto p-6 md:p-8 space-y-12">
         <header class="border-b-2 border-black pb-4 mb-8 flex justify-between items-center">
             <h1 class="text-4xl font-bold">Employee Profile</h1>
@@ -138,220 +176,328 @@
                     Changes</button>
             </div>
         </header>
-        <section class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start mb-12">
-            <div class="md:col-span-3 flex justify-center md:justify-start">
-                <div class="relative group">
+        <!-- Tabs Navigation -->
+        <div class="flex flex-wrap gap-2 mb-8 border-b-2 border-black pb-1">
+            <button id="tabProfileBtn" onclick="switchTab('profile')"
+                class="px-6 py-2 text-xl font-bold border-2 border-black border-b-0 rounded-t-lg bg-primary text-white shadow-[0_-4px_0_0_rgba(0,0,0,0.1)] -mb-[2px] z-10 transition-all">
+                Profile Info
+            </button>
+            <button id="tabSalaryBtn" onclick="switchTab('salary')"
+                class="px-6 py-2 text-xl font-bold border-2 border-black border-b-0 rounded-t-lg bg-gray-100 text-gray-500 hover:bg-gray-200 -mb-[2px] transition-all">
+                Salary Info
+            </button>
+            <button id="tabResumeBtn" onclick="switchTab('resume')"
+                class="px-6 py-2 text-xl font-bold border-2 border-black border-b-0 rounded-t-lg bg-gray-100 text-gray-500 hover:bg-gray-200 -mb-[2px] transition-all">
+                Resume & Skills
+            </button>
+        </div>
+
+        <!-- PROFILE TAB CONTENT -->
+        <div id="tabProfileContent" class="animate-fade-in">
+            <section class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start mb-12">
+                <div class="md:col-span-3 flex justify-center md:justify-start">
+                    <div class="relative group">
+                        <div
+                            class="w-48 h-48 rounded-full border-2 border-black overflow-hidden shadow-sketchy transition-transform hover:scale-105 bg-gray-100">
+                            <img id="profilePic" alt="Employee Photo" class="w-full h-full object-cover"
+                                src="https://ui-avatars.com/api/?name=EMP&background=random" />
+                        </div>
+                        <label id="uploadBtn" aria-label="Edit Profile Picture"
+                            class="absolute bottom-2 right-2 bg-primary text-white p-3 rounded-full border-2 border-black hover:bg-secondary transition-colors shadow-lg group-hover:animate-bounce cursor-pointer hidden">
+                            <span class="material-icons text-xl">edit</span>
+                            <input type="file" id="picInput" class="hidden" accept="image/*"
+                                onchange="uploadPhoto(this)">
+                        </label>
+                    </div>
+                </div>
+                <div class="md:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                    <!-- Data Fields -->
+                    <div class="space-y-6">
+                        <div>
+                            <input id="fullName"
+                                class="w-full text-4xl font-bold bg-transparent border-b-2 border-black border-t-0 border-l-0 border-r-0 focus:ring-0 focus:border-primary px-0 pb-2 placeholder-gray-400"
+                                type="text" value="Loading..." />
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-xl opacity-70">Login ID</label>
+                            <!-- Editable Input for ID -->
+                            <input id="loginId" disabled
+                                class="w-full text-2xl font-bold bg-transparent border-b border-gray-300 focus:border-primary focus:outline-none p-1"
+                                type="text" value="EMP-XXXX-XXXX" />
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-xl opacity-70">Email</label>
+                            <input id="email"
+                                class="sketchy-input w-full px-4 py-3 bg-white text-lg focus:ring-2 focus:ring-primary/20"
+                                type="email" value="" />
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-xl opacity-70">Mobile</label>
+                            <input id="mobile"
+                                class="sketchy-input w-full px-4 py-3 bg-white text-lg focus:ring-2 focus:ring-primary/20"
+                                type="tel" value="" />
+                        </div>
+                    </div>
+                    <div class="space-y-6 md:mt-16">
+                        <div class="space-y-2">
+                            <label class="block text-xl opacity-70">Company</label>
+                            <input id="company"
+                                class="sketchy-input w-full px-4 py-3 bg-white text-lg focus:ring-2 focus:ring-primary/20"
+                                type="text" value="" />
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-xl opacity-70">Department</label>
+                            <input id="department"
+                                class="sketchy-input w-full px-4 py-3 bg-white text-lg focus:ring-2 focus:ring-primary/20"
+                                type="text" value="" />
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-xl opacity-70">Manager</label>
+                            <input id="manager"
+                                class="sketchy-input w-full px-4 py-3 bg-white text-lg focus:ring-2 focus:ring-primary/20"
+                                type="text" value="" />
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-xl opacity-70">Location</label>
+                            <input id="location"
+                                class="sketchy-input w-full px-4 py-3 bg-white text-lg focus:ring-2 focus:ring-primary/20"
+                                type="text" value="" />
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-xl opacity-70">Status</label>
+                            <select id="status"
+                                class="sketchy-input w-full px-4 py-3 bg-white text-lg focus:ring-2 focus:ring-primary/20">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-6">
+                <div class="lg:col-span-2 space-y-12">
+                    <div class="group relative dashed-hand-drawn-border bg-white p-6 pb-12 transition-all duration-300">
+                        <h3 class="text-3xl font-bold mb-4">About</h3>
+                        <textarea id="about"
+                            class="w-full bg-transparent border-0 focus:ring-0 p-0 text-lg leading-relaxed resize-none placeholder-gray-400"
+                            placeholder="Write something about yourself..." rows="5">Loading...</textarea>
+                    </div>
+                    <div class="group relative dashed-hand-drawn-border bg-white p-6 pb-12 transition-all duration-300">
+                        <h3 class="text-3xl font-bold mb-4">What I love about my job</h3>
+                        <textarea id="jobLove"
+                            class="w-full bg-transparent border-0 focus:ring-0 p-0 text-lg leading-relaxed resize-none placeholder-gray-400"
+                            placeholder="Share your thoughts..." rows="5">Loading...</textarea>
+                    </div>
+                    <div class="group relative dashed-hand-drawn-border bg-white p-6 pb-12 transition-all duration-300">
+                        <h3 class="text-3xl font-bold mb-4">My interests and hobbies</h3>
+                        <textarea id="interests"
+                            class="w-full bg-transparent border-0 focus:ring-0 p-0 text-lg leading-relaxed resize-none placeholder-gray-400"
+                            placeholder="List your hobbies..." rows="5">Loading...</textarea>
+                    </div>
+                </div>
+                <div class="lg:col-span-1 space-y-12">
                     <div
-                        class="w-48 h-48 rounded-full border-2 border-black overflow-hidden shadow-sketchy transition-transform hover:scale-105 bg-gray-100">
-                        <img id="profilePic" alt="Employee Photo" class="w-full h-full object-cover"
-                            src="https://ui-avatars.com/api/?name=EMP&background=random" />
+                        class="group relative dashed-hand-drawn-border bg-white p-6 pb-12 h-full max-h-[500px] overflow-y-auto custom-scrollbar flex flex-col justify-between transition-all duration-300">
+                        <div>
+                            <h3 class="text-3xl font-bold mb-6 border-b-2 border-black/10 pb-2">Skills (JSON)</h3>
+                            <textarea id="skills" class="w-full bg-transparent border-0 focus:ring-0 p-0 text-lg"
+                                rows="10" placeholder='["React", "Node.js"]'></textarea>
+                        </div>
                     </div>
-                    <label id="uploadBtn" aria-label="Edit Profile Picture"
-                        class="absolute bottom-2 right-2 bg-primary text-white p-3 rounded-full border-2 border-black hover:bg-secondary transition-colors shadow-lg group-hover:animate-bounce cursor-pointer hidden">
-                        <span class="material-icons text-xl">edit</span>
-                        <input type="file" id="picInput" class="hidden" accept="image/*" onchange="uploadPhoto(this)">
-                    </label>
-                </div>
-            </div>
-            <div class="md:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-                <!-- Data Fields -->
-                <div class="space-y-6">
-                    <div>
-                        <input id="fullName"
-                            class="w-full text-4xl font-bold bg-transparent border-b-2 border-black border-t-0 border-l-0 border-r-0 focus:ring-0 focus:border-primary px-0 pb-2 placeholder-gray-400"
-                            type="text" value="Loading..." />
-                    </div>
-                    <div class="space-y-2">
-                        <label class="block text-xl opacity-70">Login ID</label>
-                        <!-- Editable Input for ID -->
-                        <input id="loginId" disabled
-                            class="w-full text-2xl font-bold bg-transparent border-b border-gray-300 focus:border-primary focus:outline-none p-1"
-                            type="text" value="EMP-XXXX-XXXX" />
-                    </div>
-                    <div class="space-y-2">
-                        <label class="block text-xl opacity-70">Email</label>
-                        <input id="email"
-                            class="sketchy-input w-full px-4 py-3 bg-white text-lg focus:ring-2 focus:ring-primary/20"
-                            type="email" value="" />
-                    </div>
-                    <div class="space-y-2">
-                        <label class="block text-xl opacity-70">Mobile</label>
-                        <input id="mobile"
-                            class="sketchy-input w-full px-4 py-3 bg-white text-lg focus:ring-2 focus:ring-primary/20"
-                            type="tel" value="" />
-                    </div>
-                </div>
-                <div class="space-y-6 md:mt-16">
-                    <div class="space-y-2">
-                        <label class="block text-xl opacity-70">Company</label>
-                        <input id="company"
-                            class="sketchy-input w-full px-4 py-3 bg-white text-lg focus:ring-2 focus:ring-primary/20"
-                            type="text" value="" />
-                    </div>
-                    <div class="space-y-2">
-                        <label class="block text-xl opacity-70">Department</label>
-                        <input id="department"
-                            class="sketchy-input w-full px-4 py-3 bg-white text-lg focus:ring-2 focus:ring-primary/20"
-                            type="text" value="" />
-                    </div>
-                    <div class="space-y-2">
-                        <label class="block text-xl opacity-70">Manager</label>
-                        <input id="manager"
-                            class="sketchy-input w-full px-4 py-3 bg-white text-lg focus:ring-2 focus:ring-primary/20"
-                            type="text" value="" />
-                    </div>
-                    <div class="space-y-2">
-                        <label class="block text-xl opacity-70">Location</label>
-                        <input id="location"
-                            class="sketchy-input w-full px-4 py-3 bg-white text-lg focus:ring-2 focus:ring-primary/20"
-                            type="text" value="" />
-                    </div>
-                    <div class="space-y-2">
-                        <label class="block text-xl opacity-70">Status</label>
-                        <select id="status"
-                            class="sketchy-input w-full px-4 py-3 bg-white text-lg focus:ring-2 focus:ring-primary/20">
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-6">
-            <div class="lg:col-span-2 space-y-12">
-                <div class="group relative dashed-hand-drawn-border bg-white p-6 pb-12 transition-all duration-300">
-                    <h3 class="text-3xl font-bold mb-4">About</h3>
-                    <textarea id="about"
-                        class="w-full bg-transparent border-0 focus:ring-0 p-0 text-lg leading-relaxed resize-none placeholder-gray-400"
-                        placeholder="Write something about yourself..." rows="5">Loading...</textarea>
-                </div>
-                <div class="group relative dashed-hand-drawn-border bg-white p-6 pb-12 transition-all duration-300">
-                    <h3 class="text-3xl font-bold mb-4">What I love about my job</h3>
-                    <textarea id="jobLove"
-                        class="w-full bg-transparent border-0 focus:ring-0 p-0 text-lg leading-relaxed resize-none placeholder-gray-400"
-                        placeholder="Share your thoughts..." rows="5">Loading...</textarea>
-                </div>
-                <div class="group relative dashed-hand-drawn-border bg-white p-6 pb-12 transition-all duration-300">
-                    <h3 class="text-3xl font-bold mb-4">My interests and hobbies</h3>
-                    <textarea id="interests"
-                        class="w-full bg-transparent border-0 focus:ring-0 p-0 text-lg leading-relaxed resize-none placeholder-gray-400"
-                        placeholder="List your hobbies..." rows="5">Loading...</textarea>
-                </div>
-            </div>
-            <div class="lg:col-span-1 space-y-12">
-                <!-- Skills and Certs can be enhanced later with dynamic lists. For now using text areas for simplicity in "Complete Plan" or implemented as JSON text. 
-                      Ideally, this would be a tagging UI. 
-                      Given "Perfectly 100% Accurately", I should try to make it list-based if possible, but let's stick to the visual structure first.
-                 -->
-                <div
-                    class="group relative dashed-hand-drawn-border bg-white p-6 pb-12 h-full max-h-[500px] overflow-y-auto custom-scrollbar flex flex-col justify-between transition-all duration-300">
-                    <div>
-                        <h3 class="text-3xl font-bold mb-6 border-b-2 border-black/10 pb-2">Skills (JSON)</h3>
-                        <textarea id="skills" class="w-full bg-transparent border-0 focus:ring-0 p-0 text-lg" rows="10"
-                            placeholder='["React", "Node.js"]'></textarea>
-                    </div>
-                </div>
-                <div
-                    class="group relative dashed-hand-drawn-border bg-white p-6 pb-12 h-full max-h-[500px] overflow-y-auto custom-scrollbar flex flex-col justify-between transition-all duration-300">
-                    <div>
-                        <h3 class="text-3xl font-bold mb-6 border-b-2 border-black/10 pb-2">Certifications (JSON)</h3>
-                        <textarea id="certifications" class="w-full bg-transparent border-0 focus:ring-0 p-0 text-lg"
-                            rows="10" placeholder='[{"name": "PMP", "date": "2023"}]'></textarea>
+                    <div
+                        class="group relative dashed-hand-drawn-border bg-white p-6 pb-12 h-full max-h-[500px] overflow-y-auto custom-scrollbar flex flex-col justify-between transition-all duration-300">
+                        <div>
+                            <h3 class="text-3xl font-bold mb-6 border-b-2 border-black/10 pb-2">Certifications (JSON)
+                            </h3>
+                            <textarea id="certifications"
+                                class="w-full bg-transparent border-0 focus:ring-0 p-0 text-lg" rows="10"
+                                placeholder='[{"name": "PMP", "date": "2023"}]'></textarea>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Salary Section (Admin Only) -->
-        <section id="salarySection" class="hidden border-t-2 border-black pt-8 mt-12 pb-12">
-            <h2 class="text-4xl font-bold mb-8">Salary Structure</h2>
-            <div class="group relative dashed-hand-drawn-border bg-white p-8 transition-all duration-300">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Basic Wage -->
-                    <div>
-                        <label class="block text-xl font-bold mb-2">Monthly Wage (CTC)</label>
-                        <input id="sal_wage" type="number" class="sketchy-input w-full px-4 py-3 bg-white text-lg"
-                            placeholder="e.g. 50000" />
+
+        <!-- SALARY TAB CONTENT (Replaced old hidden section) -->
+        <div id="tabSalaryContent" class="hidden animate-fade-in">
+
+            <section class="max-w-5xl mx-auto">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-4xl font-bold flex items-center gap-3">
+                        <span class="material-icons text-5xl text-primary">payments</span>
+                        Salary Structure
+                    </h2>
+                    <span
+                        class="bg-yellow-100 text-yellow-800 px-4 py-1 rounded-full border-2 border-black font-bold transform rotate-2">
+                        CONFIDENTIAL
+                    </span>
+                </div>
+
+                <div class="group relative dashed-hand-drawn-border bg-white p-8 transition-all duration-300">
+
+                    <!-- Global Settings -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 border-b-2 border-black/10 pb-8">
+                        <div>
+                            <label class="block text-xl font-bold mb-2">Monthly Wage (CTC)</label>
+                            <input id="sal_wage" type="number"
+                                class="w-full border-2 border-black p-3 rounded-lg shadow-sketchy font-bold text-xl"
+                                placeholder="e.g. ₹50,000" />
+                        </div>
+                        <div>
+                            <label class="block text-xl font-bold mb-2">Working Days / Week</label>
+                            <input id="sal_working_days" type="number"
+                                class="w-full border-2 border-black p-3 rounded-lg shadow-sketchy font-bold text-xl"
+                                placeholder="e.g. 5" />
+                        </div>
+                        <div>
+                            <label class="block text-xl font-bold mb-2">Break Time (Hrs)</label>
+                            <input id="sal_break_time" type="number" step="0.5"
+                                class="w-full border-2 border-black p-3 rounded-lg shadow-sketchy font-bold text-xl"
+                                placeholder="e.g. 1" />
+                        </div>
                     </div>
-                    <div>
-                        <!-- Spacer or Net Pay calc -->
-                        <label class="block text-xl font-bold mb-2 text-gray-500">Calculated Net (Approx)</label>
-                        <div id="sal_net" class="text-3xl font-bold text-green-600">--</div>
+
+                    <!-- Components -->
+                    <h3 class="text-2xl font-bold mb-6 border-b-2 border-black pb-2 inline-block">Salary Components</h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Basic -->
+                        <div
+                            class="p-4 border-2 border-black rounded-lg shadow-sketchy bg-white relative group hover:border-primary transition-colors">
+                            <label class="block font-bold text-lg mb-2">Basic Pay</label>
+                            <div class="flex gap-2">
+                                <select id="sal_basic_mode" class="border-2 border-black p-2 rounded w-1/2 font-hand">
+                                    <option value="Percentage">Percentage (%)</option>
+                                    <option value="Fixed">Fixed Amount</option>
+                                </select>
+                                <input id="sal_basic_val" type="number"
+                                    class="border-2 border-black p-2 rounded w-1/2 font-bold" placeholder="Value" />
+                            </div>
+                        </div>
+                        <!-- HRA -->
+                        <div
+                            class="p-4 border-2 border-black rounded-lg shadow-sketchy bg-white relative group hover:border-primary transition-colors">
+                            <label class="block font-bold text-lg mb-2">HRA (House Rent Allowance)</label>
+                            <div class="flex gap-2">
+                                <select id="sal_hra_mode" class="border-2 border-black p-2 rounded w-1/2 font-hand">
+                                    <option value="Percentage">Percentage (%)</option>
+                                    <option value="Fixed">Fixed Amount</option>
+                                </select>
+                                <input id="sal_hra_val" type="number"
+                                    class="border-2 border-black p-2 rounded w-1/2 font-bold" placeholder="Value" />
+                            </div>
+                        </div>
+                        <!-- Standard Allowance -->
+                        <div
+                            class="p-4 border-2 border-black rounded-lg shadow-sketchy bg-white relative group hover:border-primary transition-colors">
+                            <label class="block font-bold text-lg mb-2">Standard Allowance</label>
+                            <div class="flex gap-2">
+                                <select id="sal_std_mode" class="border-2 border-black p-2 rounded w-1/2 font-hand">
+                                    <option value="Percentage">Percentage (%)</option>
+                                    <option value="Fixed">Fixed Amount</option>
+                                </select>
+                                <input id="sal_std_val" type="number"
+                                    class="border-2 border-black p-2 rounded w-1/2 font-bold" placeholder="Value" />
+                            </div>
+                        </div>
+                        <!-- Bonus -->
+                        <div
+                            class="p-4 border-2 border-black rounded-lg shadow-sketchy bg-white relative group hover:border-primary transition-colors">
+                            <label class="block font-bold text-lg mb-2">Bonus</label>
+                            <div class="flex gap-2">
+                                <select id="sal_bonus_mode" class="border-2 border-black p-2 rounded w-1/2 font-hand">
+                                    <option value="Percentage">Percentage (%)</option>
+                                    <option value="Fixed">Fixed Amount</option>
+                                </select>
+                                <input id="sal_bonus_val" type="number"
+                                    class="border-2 border-black p-2 rounded w-1/2 font-bold" placeholder="Value" />
+                            </div>
+                        </div>
+                        <!-- LTA -->
+                        <div
+                            class="p-4 border-2 border-black rounded-lg shadow-sketchy bg-white relative group hover:border-primary transition-colors">
+                            <label class="block font-bold text-lg mb-2">LTA (Leave Travel Allowance)</label>
+                            <div class="flex gap-2">
+                                <select id="sal_lta_mode" class="border-2 border-black p-2 rounded w-1/2 font-hand">
+                                    <option value="Percentage">Percentage (%)</option>
+                                    <option value="Fixed">Fixed Amount</option>
+                                </select>
+                                <input id="sal_lta_val" type="number"
+                                    class="border-2 border-black p-2 rounded w-1/2 font-bold" placeholder="Value" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t-2 border-black/20 flex items-center justify-end gap-4">
+                        <div class="text-right mr-4 opacity-50 text-sm">
+                            <p>Changes are logged for audit purposes.</p>
+                        </div>
+                        <button onclick="saveSalary()"
+                            class="px-8 py-3 bg-primary text-white text-xl font-bold border-2 border-black rounded shadow-sketchy hover:bg-secondary hover:shadow-none hover:translate-y-1 transition-all flex items-center gap-2">
+                            <span class="material-icons">save</span>
+                            Save Salary Structure
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- RESUME TAB CONTENT -->
+        <div id="tabResumeContent" class="hidden animate-fade-in">
+            <div class="max-w-5xl mx-auto space-y-8">
+                <!-- Professional Summary -->
+                <div class="group relative dashed-hand-drawn-border bg-white p-6 transition-all duration-300">
+                    <h3 class="text-3xl font-bold mb-4 flex items-center gap-2">
+                        <span class="material-icons text-primary">description</span> Professional Summary
+                    </h3>
+                    <p id="resSummary" class="text-lg leading-relaxed text-gray-700 whitespace-pre-wrap">No summary
+                        provided.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Experience -->
+                    <div class="group relative dashed-hand-drawn-border bg-white p-6 transition-all duration-300">
+                        <h3 class="text-2xl font-bold mb-6 flex items-center gap-2 border-b-2 border-black/10 pb-2">
+                            <span class="material-icons text-primary">work</span> Experience
+                        </h3>
+                        <div id="resExperience" class="space-y-6">
+                            <p class="text-gray-500 italic">No experience listed.</p>
+                        </div>
+                    </div>
+
+                    <!-- Education -->
+                    <div class="group relative dashed-hand-drawn-border bg-white p-6 transition-all duration-300">
+                        <h3 class="text-2xl font-bold mb-6 flex items-center gap-2 border-b-2 border-black/10 pb-2">
+                            <span class="material-icons text-primary">school</span> Education
+                        </h3>
+                        <div id="resEducation" class="space-y-6">
+                            <p class="text-gray-500 italic">No education listed.</p>
+                        </div>
                     </div>
                 </div>
 
-                <hr class="my-8 border-black border-dashed">
+                <!-- Skills & Certifications -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="group relative dashed-hand-drawn-border bg-white p-6 transition-all duration-300">
+                        <h3 class="text-2xl font-bold mb-6 flex items-center gap-2 border-b-2 border-black/10 pb-2">
+                            <span class="material-icons text-primary">psychology</span> Skills
+                        </h3>
+                        <div id="resSkills" class="flex flex-wrap gap-2">
+                            <p class="text-gray-500 italic">No skills listed.</p>
+                        </div>
+                    </div>
 
-                <h3 class="text-2xl font-bold mb-4">Components</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-                    <!-- Basic -->
-                    <div class="p-4 border border-black rounded bg-white">
-                        <label class="block font-bold">Basic Pay</label>
-                        <div class="flex gap-2 mt-2">
-                            <select id="sal_basic_mode" class="border border-black p-2 rounded">
-                                <option value="Percentage">Percentage (%)</option>
-                                <option value="Fixed">Fixed Amount</option>
-                            </select>
-                            <input id="sal_basic_val" type="number" class="border border-black p-2 rounded w-full"
-                                placeholder="Value" />
+                    <div class="group relative dashed-hand-drawn-border bg-white p-6 transition-all duration-300">
+                        <h3 class="text-2xl font-bold mb-6 flex items-center gap-2 border-b-2 border-black/10 pb-2">
+                            <span class="material-icons text-primary">verified</span> Certifications
+                        </h3>
+                        <div id="resCerts" class="space-y-4">
+                            <p class="text-gray-500 italic">No certifications listed.</p>
                         </div>
                     </div>
-                    <!-- HRA -->
-                    <div class="p-4 border border-black rounded bg-white">
-                        <label class="block font-bold">HRA</label>
-                        <div class="flex gap-2 mt-2">
-                            <select id="sal_hra_mode" class="border border-black p-2 rounded">
-                                <option value="Percentage">Percentage (%)</option>
-                                <option value="Fixed">Fixed Amount</option>
-                            </select>
-                            <input id="sal_hra_val" type="number" class="border border-black p-2 rounded w-full"
-                                placeholder="Value" />
-                        </div>
-                    </div>
-                    <!-- Standard Allowance -->
-                    <div class="p-4 border border-black rounded bg-white">
-                        <label class="block font-bold">Standard Allowance</label>
-                        <div class="flex gap-2 mt-2">
-                            <select id="sal_std_mode" class="border border-black p-2 rounded">
-                                <option value="Percentage">Percentage (%)</option>
-                                <option value="Fixed">Fixed Amount</option>
-                            </select>
-                            <input id="sal_std_val" type="number" class="border border-black p-2 rounded w-full"
-                                placeholder="Value" />
-                        </div>
-                    </div>
-                    <!-- Bonus -->
-                    <div class="p-4 border border-black rounded bg-white">
-                        <label class="block font-bold">Bonus</label>
-                        <div class="flex gap-2 mt-2">
-                            <select id="sal_bonus_mode" class="border border-black p-2 rounded">
-                                <option value="Percentage">Percentage (%)</option>
-                                <option value="Fixed">Fixed Amount</option>
-                            </select>
-                            <input id="sal_bonus_val" type="number" class="border border-black p-2 rounded w-full"
-                                placeholder="Value" />
-                        </div>
-                    </div>
-                    <!-- LTA -->
-                    <div class="p-4 border border-black rounded bg-white">
-                        <label class="block font-bold">LTA</label>
-                        <div class="flex gap-2 mt-2">
-                            <select id="sal_lta_mode" class="border border-black p-2 rounded">
-                                <option value="Percentage">Percentage (%)</option>
-                                <option value="Fixed">Fixed Amount</option>
-                            </select>
-                            <input id="sal_lta_val" type="number" class="border border-black p-2 rounded w-full"
-                                placeholder="Value" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-8 flex justify-end">
-                    <button onclick="saveSalary()"
-                        class="px-6 py-3 bg-green-600 text-white font-bold border-2 border-black rounded shadow-sketchy hover:bg-green-700">Save
-                        Salary Details</button>
                 </div>
             </div>
-        </section>
+        </div>
     </main>
     <footer class="mt-12 py-8 border-t-2 border-black text-center opacity-60">
         <p>© 2026 Odoo HRMS. All rights reserved.</p>
@@ -362,6 +508,88 @@
         const empId = new URLSearchParams(window.location.search).get('id'); // Get ID from URL
         let currentUserRole = 'EMPLOYEE';
 
+        // Admin Navbar Template
+        const adminNavbarHTML = `
+        <div class="w-full flex flex-wrap items-center justify-between">
+            <div class="flex items-center gap-3">
+                 <div class="flex items-center justify-center p-1">
+                    <img src="/assets/logg_odooHRMS.png" alt="Odoo Logo" class="h-20 w-20 object-contain">
+                 </div>
+                 <!-- Removed Odoo HRMS Text -->
+            </div>
+
+            <!-- Admin Navigation -->
+            <nav class="hidden md:flex items-center gap-6 absolute left-1/2 transform -translate-x-1/2">
+                <a href="/admin-dashboard.html"
+                    class="bg-white text-black px-6 py-2 text-lg font-bold border-2 border-black transform -rotate-1 shadow-[2px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:bg-gray-50 transition-all rounded-sm font-hand">
+                    Employees
+                </a>
+                <a href="/admin_attendance.html"
+                    class="bg-white text-black px-6 py-2 text-lg font-bold border-2 border-black transform rotate-1 shadow-[2px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:bg-gray-50 transition-all rounded-sm font-hand">
+                    Attendance
+                </a>
+                 <a href="/admin_timeoff.html"
+                    class="bg-white text-black px-6 py-2 text-lg font-bold border-2 border-black transform -rotate-1 shadow-[2px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:bg-gray-50 transition-all rounded-sm font-hand">
+                    Time Off
+                </a>
+                 <a href="/admin_hr_management.html" id="nav-hr-management"
+                    class="bg-white text-black px-6 py-2 text-lg font-bold border-2 border-black transform rotate-1 shadow-[2px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:bg-gray-50 transition-all rounded-sm font-hand">
+                    HR Management
+                </a>
+            </nav>
+
+            <!-- Right: Avatar -->
+            <div class="hidden md:flex items-center gap-4">
+                 <button class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                    <span class="material-icons-outlined text-2xl">notifications</span>
+                 </button>
+                 <div class="relative group">
+                    <button class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border-2 border-black focus:outline-none">
+                        <img id="headerAvatarAdmin" alt="Admin" class="w-full h-full object-cover" 
+                             src="https://ui-avatars.com/api/?name=Admin&background=random" />
+                    </button>
+                     <div class="absolute right-0 mt-2 w-48 bg-white border-2 border-black rounded-md shadow-hand opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all transform origin-top-right z-50">
+                        <a class="block px-4 py-2 text-lg hover:bg-purple-100" href="/admin_profile.html">My Profile</a>
+                        <button id="logoutBtnAdmin" class="block w-full text-left px-4 py-2 text-lg hover:bg-purple-100 text-red-600">
+                             Log Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+
+        function setupNavbar(role) {
+            if (role === 'ADMIN' || role === 'HR') {
+                const header = document.getElementById('mainHeader');
+                if (header) {
+                    header.innerHTML = adminNavbarHTML;
+
+                    // Re-bind Logout if replaced
+                    const logoutBtn = document.getElementById('logoutBtnAdmin');
+                    if (logoutBtn) {
+                        logoutBtn.onclick = (e) => {
+                            e.preventDefault();
+                            localStorage.removeItem('token');
+                            window.location.replace('/login.html');
+                        };
+                    }
+
+                    if (role === 'HR') {
+                        setTimeout(() => {
+                            const hrLink = document.getElementById('nav-hr-management');
+                            if (hrLink) hrLink.style.display = 'none';
+                        }, 0);
+                    }
+
+                    // Initialize Notifications
+                    const script = document.createElement('script');
+                    script.src = '/js/admin_notifications.js';
+                    document.body.appendChild(script);
+                }
+            }
+        }
+
         async function init() {
             const token = localStorage.getItem('token');
             if (!token) window.location.href = '/login.html';
@@ -371,7 +599,6 @@
             const targetDash = ['ADMIN', 'HR'].includes(userRole) ? '/admin-dashboard.html' : '/dashboard.html';
 
             document.getElementById('navLogoBtn').onclick = () => window.location.href = targetDash;
-            document.getElementById('navEmployeesBtn').href = targetDash;
 
             if (!empId) {
                 Toast.error('No Employee Specified'); // Or redirect to dashboard
@@ -395,16 +622,89 @@
                     return;
                 }
 
+                // DYNAMIC NAVBAR SWITCH
+                setupNavbar(data.meta.role);
+
                 populate(data.employee);
                 setupPermissions(data.meta);
 
+                // Fetch Resume Data
+                fetchResume();
+
                 // Fetch Salary if Admin
-                if (data.meta.is_admin_or_hr) {
-                    document.getElementById('salarySection').classList.remove('hidden');
+                const isAdminOrHR = ['ADMIN', 'HR'].includes(data.meta.role);
+                if (isAdminOrHR) {
+                    // document.getElementById('salarySection').classList.remove('hidden'); // Logic moved to Tabs
+                    document.getElementById('tabSalaryBtn').classList.remove('hidden');
                     fetchSalary();
+                } else {
+                    document.getElementById('tabSalaryBtn').classList.add('hidden');
                 }
 
             } catch (e) { console.error(e); }
+        }
+
+        function switchTab(tab) {
+            const profileContent = document.getElementById('tabProfileContent');
+            const salaryContent = document.getElementById('tabSalaryContent');
+            const resumeContent = document.getElementById('tabResumeContent');
+            const btnProfile = document.getElementById('tabProfileBtn');
+            const btnSalary = document.getElementById('tabSalaryBtn');
+            const btnResume = document.getElementById('tabResumeBtn');
+
+            if (tab === 'profile') {
+                profileContent.classList.remove('hidden');
+                salaryContent.classList.add('hidden');
+
+                // Style Active
+                btnProfile.classList.add('bg-primary', 'text-white', 'shadow-[0_-4px_0_0_rgba(0,0,0,0.1)]', 'z-10');
+                btnProfile.classList.remove('bg-gray-100', 'text-gray-500', 'hover:bg-gray-200');
+
+                // Style Inactive
+                btnSalary.classList.add('bg-gray-100', 'text-gray-500', 'hover:bg-gray-200');
+                btnSalary.classList.remove('bg-primary', 'text-white', 'shadow-[0_-4px_0_0_rgba(0,0,0,0.1)]', 'z-10');
+
+                btnResume.classList.add('bg-gray-100', 'text-gray-500', 'hover:bg-gray-200');
+                btnResume.classList.remove('bg-primary', 'text-white', 'shadow-[0_-4px_0_0_rgba(0,0,0,0.1)]', 'z-10');
+
+                profileContent.classList.remove('hidden');
+                salaryContent.classList.add('hidden');
+                resumeContent.classList.add('hidden');
+
+            } else if (tab === 'salary') {
+                profileContent.classList.add('hidden');
+                salaryContent.classList.remove('hidden');
+
+                // Style Active
+                btnSalary.classList.add('bg-primary', 'text-white', 'shadow-[0_-4px_0_0_rgba(0,0,0,0.1)]', 'z-10');
+                btnSalary.classList.remove('bg-gray-100', 'text-gray-500', 'hover:bg-gray-200');
+
+                // Style Inactive
+                btnProfile.classList.add('bg-gray-100', 'text-gray-500', 'hover:bg-gray-200');
+                btnProfile.classList.remove('bg-primary', 'text-white', 'shadow-[0_-4px_0_0_rgba(0,0,0,0.1)]', 'z-10');
+
+                btnResume.classList.add('bg-gray-100', 'text-gray-500', 'hover:bg-gray-200');
+                btnResume.classList.remove('bg-primary', 'text-white', 'shadow-[0_-4px_0_0_rgba(0,0,0,0.1)]', 'z-10');
+
+                profileContent.classList.add('hidden');
+                salaryContent.classList.remove('hidden');
+                resumeContent.classList.add('hidden');
+            } else if (tab === 'resume') {
+                // Style Active
+                btnResume.classList.add('bg-primary', 'text-white', 'shadow-[0_-4px_0_0_rgba(0,0,0,0.1)]', 'z-10');
+                btnResume.classList.remove('bg-gray-100', 'text-gray-500', 'hover:bg-gray-200');
+
+                // Style Inactive
+                btnProfile.classList.add('bg-gray-100', 'text-gray-500', 'hover:bg-gray-200');
+                btnProfile.classList.remove('bg-primary', 'text-white', 'shadow-[0_-4px_0_0_rgba(0,0,0,0.1)]', 'z-10');
+
+                btnSalary.classList.add('bg-gray-100', 'text-gray-500', 'hover:bg-gray-200');
+                btnSalary.classList.remove('bg-primary', 'text-white', 'shadow-[0_-4px_0_0_rgba(0,0,0,0.1)]', 'z-10');
+
+                profileContent.classList.add('hidden');
+                salaryContent.classList.add('hidden');
+                resumeContent.classList.remove('hidden');
+            }
         }
 
         function populate(emp) {
@@ -431,7 +731,7 @@
         function setupPermissions(meta) {
             if (meta.permission === 'read_only') {
                 // Disable all inputs
-                const inputs = document.querySelectorAll('input, textarea, select');
+                const inputs = document.querySelectorAll('#tabProfileContent input, #tabProfileContent textarea, #tabProfileContent select');
                 inputs.forEach(el => {
                     el.disabled = true;
                     el.classList.add('cursor-not-allowed', 'bg-gray-50');
@@ -460,6 +760,10 @@
                     if (data) {
                         document.getElementById('sal_wage').value = data.monthly_wage || '';
 
+                        // New Fields
+                        document.getElementById('sal_working_days').value = data.working_days_per_week || 5;
+                        document.getElementById('sal_break_time').value = data.break_time || 1.0;
+
                         // Components
                         document.getElementById('sal_basic_mode').value = data.basic_mode || 'Percentage';
                         document.getElementById('sal_basic_val').value = data.basic_value || 50;
@@ -483,6 +787,9 @@
         async function saveSalary() {
             const body = {
                 monthly_wage: document.getElementById('sal_wage').value,
+                working_days_per_week: document.getElementById('sal_working_days').value,
+                break_time: document.getElementById('sal_break_time').value,
+
                 basic_mode: document.getElementById('sal_basic_mode').value,
                 basic_value: document.getElementById('sal_basic_val').value,
                 hra_mode: document.getElementById('sal_hra_mode').value,
@@ -510,6 +817,70 @@
             } catch (e) {
                 console.error(e);
                 Toast.error('Failed to save salary');
+            }
+        }
+
+        async function fetchResume() {
+            try {
+                const res = await fetch(`${API_BASE}/resume/${empId}`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    renderResume(data);
+                }
+            } catch (e) { console.error('Resume Fetch Error', e); }
+        }
+
+        function renderResume(data) {
+            // Summary
+            if (data.summary) document.getElementById('resSummary').innerText = data.summary;
+
+            // Experience
+            if (data.experiences && data.experiences.length > 0) {
+                const expHtml = data.experiences.map(exp => `
+                    <div class="border-l-4 border-primary pl-4 py-1">
+                        <h4 class="text-xl font-bold">${exp.role}</h4>
+                        <p class="text-gray-700 font-bold">${exp.company} | ${exp.duration}</p>
+                        <p class="text-gray-600 mt-1 text-sm">${exp.description || ''}</p>
+                    </div>
+                `).join('');
+                document.getElementById('resExperience').innerHTML = expHtml;
+            }
+
+            // Education
+            if (data.educations && data.educations.length > 0) {
+                const eduHtml = data.educations.map(edu => `
+                    <div class="border-l-4 border-black pl-4 py-1">
+                        <h4 class="text-xl font-bold">${edu.degree}</h4>
+                        <p class="text-gray-700 font-bold">${edu.institute} | ${edu.year}</p>
+                    </div>
+                `).join('');
+                document.getElementById('resEducation').innerHTML = eduHtml;
+            }
+
+            // Skills
+            if (data.skills && data.skills.length > 0) {
+                const skillsHtml = data.skills.map(s => `
+                    <span class="bg-gray-100 border border-black/20 px-3 py-1 rounded-full text-sm font-bold text-gray-700">
+                        ${s}
+                    </span>
+                `).join('');
+                document.getElementById('resSkills').innerHTML = skillsHtml;
+            }
+
+            // Certifications
+            if (data.certifications && data.certifications.length > 0) {
+                const certHtml = data.certifications.map(c => `
+                    <div class="flex items-start gap-2">
+                        <span class="material-icons text-primary text-sm mt-1">verified</span>
+                        <div>
+                            <p class="font-bold">${c.name}</p>
+                            <p class="text-xs text-gray-500">${c.date || ''}</p>
+                        </div>
+                    </div>
+                `).join('');
+                document.getElementById('resCerts').innerHTML = certHtml;
             }
         }
 

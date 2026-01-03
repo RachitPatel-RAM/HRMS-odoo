@@ -250,7 +250,8 @@
                 <div><label class="block font-bold mb-1">Check Out</label><input id="editOut"
                         class="w-full border-2 border-black rounded px-2 py-1" type="time" step="1">
                 </div>
-                <div><label class="block font-bold mb-1">Lunch (Hrs)</label><input id="editLunch"
+                <div><label class="block font-bold mb-1">Lunch (Hrs) <span id="configLunchDisplay"
+                            class="text-xs text-gray-500 font-normal ml-2"></span></label><input id="editLunch"
                         class="w-full border-2 border-black rounded px-2 py-1" type="number" step="0.5"></div>
                 <div><label class="block font-bold mb-1">Notes</label><input id="editNotes"
                         class="w-full border-2 border-black rounded px-2 py-1" type="text"></div>
@@ -344,11 +345,18 @@
             document.getElementById('headerRowCols').innerHTML = colsHtml;
         }
 
+        function formatDateLocal(d) {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
         async function fetchWeeklyData() {
             const token = localStorage.getItem('token');
-            const startStr = currentStartDate.toISOString().split('T')[0];
+            const startStr = formatDateLocal(currentStartDate);
             const end = new Date(currentStartDate); end.setDate(end.getDate() + 6);
-            const endStr = end.toISOString().split('T')[0];
+            const endStr = formatDateLocal(end);
 
             document.getElementById('attendanceBody').innerHTML = `<tr><td colspan="100" class="p-8 text-center text-xl">Loading...</td></tr>`;
 
@@ -388,12 +396,12 @@
 
                 for (let i = 0; i < 7; i++) {
                     const d = new Date(currentStartDate); d.setDate(d.getDate() + i);
-                    const dateStr = d.toISOString().split('T')[0];
+                    const dateStr = formatDateLocal(d);
                     const dayAtt = attMap[dateStr] || {};
 
                     // Formats
-                    const inTime = dayAtt.check_in_time ? new Date(dayAtt.check_in_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
-                    const outTime = dayAtt.check_out_time ? new Date(dayAtt.check_out_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
+                    const inTime = dayAtt.check_in_time ? new Date(dayAtt.check_in_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '-';
+                    const outTime = dayAtt.check_out_time ? new Date(dayAtt.check_out_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '-';
 
                     // Lunch Default Logic
                     let lunchDisplay = '<span class="text-gray-400">2h</span>';
@@ -410,8 +418,8 @@
                     }
 
                     // Edit Params
-                    const checkInVal = dayAtt.check_in_time ? new Date(dayAtt.check_in_time).toTimeString().substr(0, 5) : '';
-                    const checkOutVal = dayAtt.check_out_time ? new Date(dayAtt.check_out_time).toTimeString().substr(0, 5) : '';
+                    const checkInVal = dayAtt.check_in_time ? new Date(dayAtt.check_in_time).toTimeString().substr(0, 8) : ''; // HH:mm:ss
+                    const checkOutVal = dayAtt.check_out_time ? new Date(dayAtt.check_out_time).toTimeString().substr(0, 8) : '';
                     const lunchVal = dayAtt.lunch_duration || '2';
                     const notesVal = dayAtt.notes || '';
                     const otStatusVal = dayAtt.overtime_status || 'N/A';
@@ -432,6 +440,27 @@
             document.getElementById('showingText').innerText = `Showing ${data.length} Employees`;
         }
 
+        async function fetchSalaryInfo(empId) {
+            const label = document.getElementById('configLunchDisplay');
+            label.innerText = '(Loading...)';
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`${API_BASE}/employees/${empId}/salary`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const d = await res.json();
+                    if (d.exists && d.data) {
+                        label.innerText = `(Config: ${d.data.break_time || 1}h)`;
+                    } else {
+                        label.innerText = '(Config: Not Set)';
+                    }
+                } else {
+                    label.innerText = '(Config: Error)';
+                }
+            } catch (e) { console.error(e); label.innerText = ''; }
+        }
+
         function openEdit(empId, date, inTime, outTime, lunch, notes, otStatus) {
             document.getElementById('editEmpId').value = empId;
             document.getElementById('editDate').value = date;
@@ -441,6 +470,10 @@
             document.getElementById('editNotes').value = notes;
             document.getElementById('editOtStatus').value = otStatus || 'N/A';
             document.getElementById('editReason').value = '';
+            document.getElementById('configLunchDisplay').innerText = ''; // Reset
+
+            fetchSalaryInfo(empId);
+
             document.getElementById('editModal').classList.remove('hidden');
             document.getElementById('editModal').classList.add('flex');
         }
@@ -530,6 +563,7 @@
 
         init();
     </script>
+    <script src="/js/admin_notifications.js"></script>
 </body>
 
 </html>

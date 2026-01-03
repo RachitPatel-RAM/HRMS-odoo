@@ -63,6 +63,12 @@ exports.createRequest = async (req, res) => {
         }
 
         const leave = await leaveService.createRequest(user.Employee.id, requestData);
+
+        // Notify Admins
+        const notificationController = require('./notificationController');
+        const msg = `New Leave Request: ${user.Employee.first_name} ${user.Employee.last_name} - ${leave.type} (${leave.days_count} days)`;
+        await notificationController.createNotification('LEAVE_REQUEST', msg, 'ADMIN', leave.id, 'Leave');
+
         res.status(201).json(leave);
     } catch (error) {
         res.status(400).json({ message: error.message });
