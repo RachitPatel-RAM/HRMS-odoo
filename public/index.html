@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html class="" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Sign Up - HRMS</title>
+    <link href="/css/output.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+</head>
+
+<body
+    class="bg-background-light min-h-screen flex items-center justify-center p-4 font-display text-gray-900 selection:bg-primary selection:text-white">
+    <div class="w-full max-w-lg bg-surface-light border-2 border-black rounded-xl shadow-sketch p-6 md:p-10 relative">
+        <h1 class="text-3xl md:text-4xl mb-6 text-center -rotate-1">Sign Up Page</h1>
+        <div
+            class="w-full h-20 bg-gray-100 border-2 border-black rounded-lg flex items-center justify-center mb-8 shadow-sketch-sm">
+            <img src="/assets/logg_odooHRMS.png" alt="HRMS Logo" class="h-12 object-contain filter brightness-0 invert"
+                style="filter: none;" />
+        </div>
+
+        <!-- Stage 1: Registration Form -->
+        <form id="signupForm" class="space-y-5">
+            <div id="errorMsg"
+                class="hidden w-full bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative text-center">
+            </div>
+
+            <div class="space-y-1">
+                <label class="block text-xl ml-1" for="company">Company Name :-</label>
+                <div class="flex gap-3">
+                    <input
+                        class="w-full bg-white border-2 border-black rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder-gray-400 shadow-sm"
+                        id="company" name="companyName" placeholder="Acme Corp" type="text" required />
+                </div>
+            </div>
+            <div class="space-y-1">
+                <label class="block text-xl ml-1" for="name">Name :-</label>
+                <input
+                    class="w-full bg-white border-2 border-black rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder-gray-400 shadow-sm"
+                    id="name" name="fullName" placeholder="John Doe" type="text" required />
+            </div>
+            <div class="space-y-1">
+                <label class="block text-xl ml-1" for="email">Email :-</label>
+                <input
+                    class="w-full bg-white border-2 border-black rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder-gray-400 shadow-sm"
+                    id="email" name="email" placeholder="john@example.com" type="email" required />
+            </div>
+            <div class="space-y-1">
+                <label class="block text-xl ml-1" for="phone">Phone :-</label>
+                <input
+                    class="w-full bg-white border-2 border-black rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder-gray-400 shadow-sm"
+                    id="phone" name="phone" placeholder="+1 (555) 000-0000" type="tel" required />
+            </div>
+            <button
+                class="w-full mt-6 bg-primary hover:bg-primary-dark text-white text-2xl py-3 rounded-lg border-2 border-black shadow-sketch hover:translate-y-1 hover:shadow-none transition-all duration-200"
+                type="submit" id="signupBtn">
+                Get Verification Code
+            </button>
+        </form>
+
+        <!-- Stage 2: Verification Form (Hidden initially) -->
+        <form id="verifyForm" class="space-y-5 hidden">
+            <div class="text-center space-y-2">
+                <h2 class="text-2xl font-bold">Complete Registration</h2>
+                <p class="text-gray-600">Enter the code sent to your email and set your password.</p>
+            </div>
+            <div class="space-y-1">
+                <label class="block text-xl ml-1" for="code">Verification Code (Temp Password) :-</label>
+                <input
+                    class="w-full bg-white border-2 border-black rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder-gray-400 shadow-sm"
+                    id="code" name="code" placeholder="Enter code" type="text" required />
+            </div>
+            <div class="space-y-1">
+                <label class="block text-xl ml-1" for="new-password">New Password :-</label>
+                <div class="relative">
+                    <input
+                        class="w-full bg-white border-2 border-black rounded-lg px-4 py-2 pr-12 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder-gray-400 shadow-sm"
+                        id="new-password" name="newPassword" placeholder="••••••••" type="password" required />
+                    <button
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-primary transition-colors"
+                        type="button" onclick="toggleVisibility('new-password')">
+                        <span class="material-icons-round text-xl">visibility_off</span>
+                    </button>
+                </div>
+            </div>
+            <div class="space-y-1">
+                <label class="block text-xl ml-1" for="confirm-password">Confirm Password :-</label>
+                <div class="relative">
+                    <input
+                        class="w-full bg-white border-2 border-black rounded-lg px-4 py-2 pr-12 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder-gray-400 shadow-sm"
+                        id="confirm-password" placeholder="••••••••" type="password" required />
+                    <button
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-primary transition-colors"
+                        type="button" onclick="toggleVisibility('confirm-password')">
+                        <span class="material-icons-round text-xl">visibility_off</span>
+                    </button>
+                </div>
+            </div>
+            <button
+                class="w-full mt-6 bg-green-600 hover:bg-green-700 text-white text-2xl py-3 rounded-lg border-2 border-black shadow-sketch hover:translate-y-1 hover:shadow-none transition-all duration-200"
+                type="submit">
+                Register
+            </button>
+        </form>
+
+        <!-- Stage 3: Success Message (Hidden initially) -->
+        <div id="successMessage" class="hidden text-center space-y-6 py-4">
+            <div
+                class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto border-2 border-black shadow-sm">
+                <span class="material-icons-round text-4xl text-green-600">check_circle</span>
+            </div>
+            <div class="space-y-2">
+                <h2 class="text-3xl font-bold text-gray-800">Registration Successful!</h2>
+                <div class="bg-purple-50 border-2 border-purple-200 rounded-lg p-4">
+                    <p class="text-xl text-gray-800" id="successText"></p>
+                </div>
+            </div>
+            <a href="/login.html"
+                class="inline-block w-full bg-primary hover:bg-primary-dark text-white text-2xl py-3 rounded-lg border-2 border-black shadow-sketch hover:translate-y-1 hover:shadow-none transition-all duration-200">
+                Login Now
+            </a>
+        </div>
+
+        <div class="mt-8 text-center" id="switchLink">
+            <p class="text-xl">
+                Already have an account ?
+                <a class="text-primary hover:text-primary-dark underline decoration-2 underline-offset-4 decoration-wavy decoration-primary/30 hover:decoration-primary transition-all"
+                    href="/login.html">
+                    Sign In
+                </a>
+            </p>
+        </div>
+        <div class="text-center mt-4">
+            <p class="text-sm text-gray-500">
+                &copy; 2026 odoo HRMS. All rights reserved
+            </p>
+        </div>
+    </div>
+
+
+    <script>
+        // Auto-Redirect if logged in
+        if (localStorage.getItem('token')) {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (user.role === 'ADMIN' || user.role === 'HR') {
+                window.location.href = '/admin-dashboard.html';
+            } else {
+                window.location.href = '/dashboard.html';
+            }
+        }
+
+        // State to hold Stage 1 data
+        let signupData = {};
+        let signupToken = null; // Store token from init
+
+        function toggleVisibility(id) {
+            const input = document.getElementById(id);
+            if (input.type === 'password') {
+                input.type = 'text';
+            } else {
+                input.type = 'password';
+            }
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('errorMsg');
+            el.textContent = msg;
+            el.classList.remove('hidden');
+        }
+
+        // Stage 1: Init Signup
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            // Split Name and formatting handled by backend or later? 
+            // Better to send raw and let backend format.
+
+            const payload = {
+                companyName: data.companyName,
+                fullName: data.fullName, // Send full name
+                email: data.email,
+                phone: data.phone
+            };
+
+            const btn = document.getElementById('signupBtn');
+            btn.innerText = 'Sending...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/auth/signup-init', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await res.json();
+
+                if (res.ok) {
+                    signupData = payload;
+                    signupToken = result.signupToken; // capture token
+
+                    // Switch to verify form
+                    document.getElementById('signupForm').classList.add('hidden');
+                    document.getElementById('verifyForm').classList.remove('hidden');
+                    document.getElementById('switchLink').classList.add('hidden');
+                    document.getElementById('errorMsg').classList.add('hidden');
+                } else {
+                    showError(result.message || 'Signup Failed');
+                    btn.innerText = 'Get Verification Code';
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                showError('Network Error');
+                btn.innerText = 'Get Verification Code';
+                btn.disabled = false;
+            }
+        });
+
+        // Stage 2: Complete
+        document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const code = document.getElementById('code').value; // Temp Password
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            if (newPassword !== confirmPassword) {
+                showError("Passwords do not match");
+                return;
+            }
+
+            const payload = {
+                signupToken: signupToken,
+                tempPassword: code,
+                newPassword: newPassword
+            };
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerText;
+            btn.innerText = 'Registering...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/auth/signup-complete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await res.json();
+
+                if (res.ok) {
+                    // Show success message UI
+                    document.getElementById('verifyForm').classList.add('hidden');
+                    document.getElementById('switchLink').classList.add('hidden');
+                    document.getElementById('errorMsg').classList.add('hidden');
+
+                    const successDiv = document.getElementById('successMessage');
+                    successDiv.classList.remove('hidden');
+
+                    document.getElementById('successText').innerHTML =
+                        `Your ID is <strong>${result.employeeId || 'generated'}</strong><br>Please Login`;
+                } else {
+                    showError(result.message || 'Verification Failed');
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                showError('Verification Error: ' + err.message);
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>

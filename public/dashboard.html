@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html class="" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Employee Landing Page - HRMS</title>
+    <link href="/css/output.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Gochi+Hand&amp;family=Spline+Sans:wght@400;600&amp;display=swap"
+        rel="stylesheet" />
+</head>
+<style>
+    @font-face {
+        font-family: 'Gochi Hand';
+        src: url('/fonts/gochi.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+</style>
+
+<body
+    class="bg-background-light text-gray-900 font-display antialiased transition-colors duration-200 flex flex-col min-h-screen">
+    <div class="texture-overlay"></div>
+    <header
+        class="sticky top-0 z-50 bg-white border-b-2 border-black w-full px-4 py-3 flex items-center justify-between shadow-sm">
+        <div class="flex items-center gap-4">
+            <div
+                class="hand-border bg-primary text-white p-2 px-4 font-bold text-xl tracking-wider transform -rotate-1 flex items-center justify-center">
+                <img src="/assets/logg_odooHRMS.png" alt="HRMS Logo"
+                    class="h-8 md:h-10 object-contain filter brightness-0 invert"
+                    style="filter: none; filter: brightness(0) invert(1);" />
+            </div>
+        </div>
+        <nav class="hidden md:flex items-center gap-4">
+            <a class="hand-border bg-primary text-white px-6 py-2 text-lg transform hover:-rotate-1 transition-transform shadow-hand"
+                href="#">
+                Employees
+            </a>
+            <a class="hand-border bg-white px-6 py-2 text-lg transform hover:rotate-1 hover:bg-gray-50 transition-all"
+                href="#">
+                Attendance
+            </a>
+            <a class="hand-border bg-white px-6 py-2 text-lg transform hover:-rotate-1 hover:bg-gray-50 transition-all"
+                href="#">
+                Time Off
+            </a>
+        </nav>
+        <div class="flex items-center gap-4">
+            <!-- Systray (ID added) -->
+            <div id="attendanceSystray"
+                class="hidden lg:flex items-center gap-2 hand-border px-3 py-1 bg-white border-black">
+                <span id="attStatusIcon" class="material-icons-outlined text-gray-400">schedule</span>
+                <div class="flex flex-col text-xs leading-tight">
+                    <span id="attStatusText" class="font-bold">Not Checked In</span>
+                    <span id="attTimer" class="text-gray-500">--:--</span>
+                </div>
+                <button id="attActionBtn"
+                    class="ml-2 bg-gray-100 text-gray-600 px-2 py-1 rounded text-sm font-bold hover:bg-gray-200">
+                    Loading
+                </button>
+            </div>
+
+            <div class="relative group">
+                <button
+                    class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border-2 border-black focus:outline-none focus:ring-2 focus:ring-primary">
+                    <img id="userAvatar" alt="User Avatar" class="w-full h-full object-cover"
+                        src="https://ui-avatars.com/api/?name=User&background=random" />
+                </button>
+                <div
+                    class="absolute right-0 mt-2 w-48 bg-white border-2 border-black rounded-md shadow-hand opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all transform origin-top-right z-50">
+                    <a class="block px-4 py-2 text-lg hover:bg-purple-100" href="/profile.html">My
+                        Profile</a>
+                    <a id="logoutBtn" class="block px-4 py-2 text-lg hover:bg-purple-100" href="#">Log Out</a>
+                </div>
+            </div>
+            <button class="md:hidden p-2 text-gray-700">
+                <span class="material-icons-outlined text-3xl">menu</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 max-w-6xl flex-grow">
+        <!-- Status Legend -->
+        <div
+            class="bg-white border-2 border-black rounded-lg p-4 mb-8 shadow-hand hidden md:flex justify-around items-center gap-4">
+            <div class="flex items-center gap-2">
+                <div class="w-4 h-4 bg-green-500 rounded-full border border-black shadow-sm"></div>
+                <span class="font-bold text-sm">Present (Checked In)</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="material-icons-outlined text-blue-500 transform rotate-45 text-sm">flight</span>
+                <span class="font-bold text-sm">On Leave</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="w-4 h-4 bg-yellow-400 rounded-full border border-black shadow-sm"></div>
+                <span class="font-bold text-sm">Absent</span>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <div class="w-full relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <span class="material-icons-outlined text-gray-400">search</span>
+                </span>
+                <input
+                    class="w-full pl-10 pr-4 py-3 hand-input bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-lg placeholder-gray-400 shadow-sm"
+                    placeholder="Search for employees..." type="text" />
+            </div>
+        </div>
+
+        <div id="employeeGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="text-center w-full col-span-3">Loading Employees...</div>
+        </div>
+
+        <div id="pagination_container" class="flex justify-center mt-12 gap-2">
+            <!-- Dynamic Pagination Buttons -->
+        </div>
+    </main>
+    <footer class="mt-12 py-6 border-t border-gray-300 text-center text-gray-500 text-lg">
+        <p>© 2026 odoo HRMS. All rights reserved</p>
+    </footer>
+
+    <!-- Preserved Logic -->
+    <script>
+        // Data State
+        let allEmployees = [];
+        let currentPage = 1;
+        const itemsPerPage = 6;
+        let currentUser = null;
+
+        // Main Dashboard Logic
+        async function loadDashboard() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                const response = await fetch('/api/dashboard', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Dashboard API Response:', data); // DEBUG: Check me.profile_picture
+                currentUser = data.me;
+
+                // Safe handling of employees array
+                if (data.employees && Array.isArray(data.employees)) {
+                    allEmployees = data.employees;
+                    currentPage = 1;
+                    renderEmployees();
+                } else {
+                    console.error('Invalid employees data:', data);
+                    document.getElementById('employeeGrid').innerHTML = '<div class="text-center w-full col-span-3">No employees found.</div>';
+                }
+
+                updateSystray(data.attendance, data.me);
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                document.getElementById('employeeGrid').innerHTML = '<div class="text-center w-full col-span-3 text-red-500">Failed to load data.</div>';
+            }
+        }
+
+        function renderEmployees() {
+            const grid = document.getElementById('employeeGrid');
+            const paginationContainer = document.getElementById('pagination_container');
+
+            grid.innerHTML = '';
+            paginationContainer.innerHTML = '';
+
+            if (allEmployees.length === 0) {
+                grid.innerHTML = '<div class="text-center w-full col-span-3">No employees found.</div>';
+                return;
+            }
+
+            // Pagination Logic
+            const totalPages = Math.ceil(allEmployees.length / itemsPerPage);
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const currentItems = allEmployees.slice(startIndex, endIndex);
+
+            currentItems.forEach(emp => {
+                const isMe = currentUser && emp.id === currentUser.employeeId;
+
+                // Status Logic
+                let statusIcon = '';
+                let statusTitle = '';
+
+                if (emp.status === 'PRESENT') {
+                    statusIcon = '<div class="w-4 h-4 bg-green-500 rounded-full border border-black shadow-sm"></div>';
+                    statusTitle = 'Present (Checked In)';
+                } else if (emp.status === 'ON_LEAVE') {
+                    statusIcon = '<span class="material-icons-outlined text-blue-500 transform rotate-45">flight</span>';
+                    statusTitle = 'On Leave (Approved)';
+                } else {
+                    statusIcon = '<div class="w-4 h-4 bg-yellow-400 rounded-full border border-black shadow-sm"></div>';
+                    statusTitle = 'Absent';
+                }
+
+                const card = document.createElement('div');
+                card.className = `group bg-white hand-border p-6 relative cursor-pointer hover:-translate-y-1 hover:shadow-hand-hover transition-all duration-300 ${isMe ? 'ring-4 ring-primary ring-opacity-50' : ''}`;
+
+                // Add staggered animation delay
+                // card.style.animationDelay = `${index * 50}ms`;
+
+                card.innerHTML = `
+                    <div class="absolute top-4 right-4" title="${statusTitle}">
+                        ${statusIcon}
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="w-24 h-24 mb-4 rounded-full overflow-hidden border-2 border-black p-1 bg-white">
+                            <img alt="${emp.name}" class="w-full h-full object-cover rounded-full" 
+                                src="${emp.profile_picture || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(emp.name) + '&background=random'}" />
+                        </div>
+                        <h3 class="text-2xl font-bold mb-1 text-center group-hover:text-primary transition-colors">
+                            ${emp.name} ${isMe ? '(You)' : ''}
+                        </h3>
+                        <p class="text-gray-500 text-lg">${emp.designation || 'Employee'}</p>
+                        <div class="mt-4 flex gap-2">
+                             <span class="px-2 py-1 text-sm border border-gray-300 rounded-lg bg-gray-50">${emp.department || 'General'}</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            // Render Pagination Buttons
+            if (totalPages > 1) {
+                for (let i = 1; i <= totalPages; i++) {
+                    const btn = document.createElement('button');
+                    const isActive = i === currentPage;
+                    btn.className = `w-10 h-10 flex items-center justify-center hand-border text-lg transition-all ${isActive ? 'bg-primary text-white' : 'bg-white hover:bg-gray-100'}`;
+                    btn.innerText = i;
+                    btn.onclick = () => {
+                        currentPage = i;
+                        renderEmployees();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    };
+                    paginationContainer.appendChild(btn);
+                }
+            }
+        }
+
+        function updateSystray(attendance, me) {
+            const container = document.getElementById('attendanceSystray');
+            const icon = document.getElementById('attStatusIcon');
+            const text = document.getElementById('attStatusText');
+            const timer = document.getElementById('attTimer');
+            const btn = document.getElementById('attActionBtn');
+            const avatar = document.getElementById('userAvatar');
+
+            // Update Avatar
+            if (me) {
+                const avatarUrl = me.profile_picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(me.name || 'User')}&background=random`;
+                avatar.src = avatarUrl;
+            }
+
+            container.classList.remove('hidden', 'lg:flex');
+            container.classList.add('flex');
+
+            if (attendance && attendance.check_in_time && !attendance.check_out_time) {
+                // Checked In
+                icon.innerText = 'check_circle';
+                icon.className = 'material-icons-outlined text-green-600';
+                text.innerText = 'Checked In';
+
+                const time = new Date(attendance.check_in_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                timer.innerText = `Since ${time}`;
+
+                btn.innerText = 'Check Out';
+                btn.className = 'ml-2 bg-red-100 text-red-600 px-2 py-1 rounded text-sm font-bold hover:bg-red-200';
+                btn.onclick = () => doAttendance('check-out');
+            } else if (attendance && attendance.check_out_time) {
+                // Checked Out (Session Closed) - Allow Re-Check In
+                icon.innerText = 'history';
+                icon.className = 'material-icons-outlined text-gray-500';
+                text.innerText = 'Checked Out';
+
+                const time = new Date(attendance.check_out_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                timer.innerText = `At ${time}`;
+
+                btn.innerText = 'Check In';
+                btn.disabled = false;
+                btn.className = 'ml-2 bg-green-100 text-green-600 px-2 py-1 rounded text-sm font-bold hover:bg-green-200';
+                btn.onclick = () => doAttendance('check-in');
+            } else {
+                // Not Checked In
+                icon.innerText = 'schedule';
+                icon.className = 'material-icons-outlined text-gray-400';
+                text.innerText = 'Not Checked In';
+                timer.innerText = '--:--';
+
+                btn.innerText = 'Check In';
+                btn.className = 'ml-2 bg-green-100 text-green-600 px-2 py-1 rounded text-sm font-bold hover:bg-green-200';
+                btn.onclick = () => doAttendance('check-in');
+            }
+        }
+
+        async function doAttendance(action) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/api/attendance/${action}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    loadDashboard(); // Reload to update UI
+                } else {
+                    alert('Attendance Action Failed');
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        });
+
+        // Idle Timeout Logic
+        let idleTimer;
+        const IDLE_LIMIT = 15 * 60 * 1000; // 15 Minutes
+
+        function resetIdleTimer() {
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => {
+                // Auto Logout
+                alert('You have been logged out due to inactivity.');
+                localStorage.removeItem('token');
+                window.location.href = '/login.html';
+            }, IDLE_LIMIT);
+        }
+
+        ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(evt => {
+            window.addEventListener(evt, resetIdleTimer);
+        });
+        resetIdleTimer();
+
+        // Init
+        loadDashboard();
+    </script>
+</body>
+
+</html>

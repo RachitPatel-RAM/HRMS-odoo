@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme {
+    --color-primary: #9C27B0;
+    --color-primary-hover: #6447e8;
+    --color-primary-dark: #6347EB;
+    --color-secondary: #6A1B9A;
+    --color-active: #9C27B0;
+
+    --color-background-light: #f8f6f8;
+
+    --color-card-light: #FFFFFF;
+    --color-surface-light: #FFFFFF;
+
+    --color-text-light: #1F2937;
+
+    --font-display: "Gochi Hand", cursive;
+    --font-body: "Gochi Hand", cursive;
+    --font-sans: "Inter", sans-serif;
+    --font-jakarta: "Plus Jakarta Sans", sans-serif;
+    --font-spline: "Spline Sans", sans-serif;
+
+    --shadow-hand: 2px 3px 0px 0px rgba(0, 0, 0, 1);
+    --shadow-hand-hover: 4px 5px 0px 0px rgba(123, 97, 255, 1);
+    --shadow-hand-active: 1px 1px 0px 0px rgba(0, 0, 0, 1);
+
+    --shadow-sketch: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+    --shadow-sketch-sm: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+}
+
+@font-face {
+    font-family: 'Gochi Hand';
+    src: url('/fonts/GochiHand-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Custom Utilities */
+.hand-border {
+    border: 2px solid black;
+    border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+}
+
+.hand-input {
+    border: 2px solid black;
+    border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+}
+
+.texture-overlay {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuDDZU6OYjo19HOQ9hC2rkmGYllliqBE49spDsiXJAyFEu-oLDEKNm9TPlChPA-0_x8BJiWxFDc8u_pCmsuZA6tWamS9OKDXN5qJtRU09-TZcBNyZpWPyzJ5PVcRj7m3kpZn0Cq_waeo94ttM0_9Kam4pLyhBVQXlbldOFG7oPf47NA43NqF-AFf5fLFNpiMg4-ZA0MCjHS-N932asO8Q9jb9nGYiAkqWhcfTFVY3_VvFDZvxwnbYAOXq0XgzjvydY9YvUYJ-sakE3c);
+    opacity: 0.4;
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
