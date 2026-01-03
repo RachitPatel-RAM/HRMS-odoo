@@ -814,58 +814,76 @@
         };
 
         // Add Listeners
-        document.getElementById('btnAddExp').addEventListener('click', () => {
-            resumeData.experiences.unshift({ title: '', company_name: '', start_date: '', end_date: '', description: '' });
-            renderResume();
-        });
-        document.getElementById('btnAddEdu').addEventListener('click', () => {
-            resumeData.educations.unshift({ degree: '', institution_name: '', completion_year: new Date().getFullYear(), grade: '' });
-            renderResume();
-        });
-        document.getElementById('btnAddSkill').addEventListener('click', () => {
-            resumeData.skills.push({ skill_name: 'New Skill', proficiency: 'Intermediate' });
-            renderResume();
-        });
-        document.getElementById('btnAddCert').addEventListener('click', () => {
-            resumeData.certifications.unshift({ certification_name: '', organization: '', year: new Date().getFullYear() });
-            renderResume();
-        });
+        const btnAddExp = document.getElementById('btnAddExp');
+        if (btnAddExp) {
+            btnAddExp.addEventListener('click', () => {
+                resumeData.experiences.unshift({ title: '', company_name: '', start_date: '', end_date: '', description: '' });
+                renderResume();
+            });
+        }
+
+        const btnAddEdu = document.getElementById('btnAddEdu');
+        if (btnAddEdu) {
+            btnAddEdu.addEventListener('click', () => {
+                resumeData.educations.unshift({ degree: '', institution_name: '', completion_year: new Date().getFullYear(), grade: '' });
+                renderResume();
+            });
+        }
+
+        const btnAddSkill = document.getElementById('btnAddSkill');
+        if (btnAddSkill) {
+            btnAddSkill.addEventListener('click', () => {
+                resumeData.skills.push({ skill_name: 'New Skill', proficiency: 'Intermediate' });
+                renderResume();
+            });
+        }
+
+        const btnAddCert = document.getElementById('btnAddCert');
+        if (btnAddCert) {
+            btnAddCert.addEventListener('click', () => {
+                resumeData.certifications.unshift({ certification_name: '', organization: '', year: new Date().getFullYear() });
+                renderResume();
+            });
+        }
 
         // Save Resume
-        document.getElementById('btnSaveResume').addEventListener('click', async () => {
-            const summary = document.getElementById('resumeSummary').value;
-            const payload = {
-                summary,
-                experiences: resumeData.experiences,
-                educations: resumeData.educations,
-                skills: resumeData.skills,
-                certifications: resumeData.certifications
-            };
+        const btnSaveResume = document.getElementById('btnSaveResume');
+        if (btnSaveResume) {
+            btnSaveResume.addEventListener('click', async () => {
+                const summary = document.getElementById('resumeSummary').value;
+                const payload = {
+                    summary,
+                    experiences: resumeData.experiences,
+                    educations: resumeData.educations,
+                    skills: resumeData.skills,
+                    certifications: resumeData.certifications
+                };
 
-            const btn = document.getElementById('btnSaveResume');
-            btn.innerText = 'Saving...';
-            btn.disabled = true;
+                const btn = document.getElementById('btnSaveResume');
+                btn.innerText = 'Saving...';
+                btn.disabled = true;
 
-            try {
-                const token = localStorage.getItem('token');
-                const res = await fetch(`${API_BASE}/resume/me`, {
-                    method: 'PUT',
-                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (!res.ok) throw new Error('Save failed');
-                const data = await res.json();
-                resumeData = data; // Sync
-                renderResume();
-                alert('Resume Profile Saved!');
-            } catch (e) {
-                alert('Error saving resume');
-            } finally {
-                btn.innerText = 'Save Resume Profile';
-                btn.innerHTML = '<span class="material-icons-outlined">save</span> Save Resume Profile';
-                btn.disabled = false;
-            }
-        });
+                try {
+                    const token = localStorage.getItem('token');
+                    const res = await fetch(`${API_BASE}/resume/me`, {
+                        method: 'PUT',
+                        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!res.ok) throw new Error('Save failed');
+                    const data = await res.json();
+                    resumeData = data; // Sync
+                    renderResume();
+                    alert('Resume Profile Saved!');
+                } catch (e) {
+                    alert('Error saving resume');
+                } finally {
+                    btn.innerText = 'Save Resume Profile';
+                    btn.innerHTML = '<span class="material-icons-outlined">save</span> Save Resume Profile';
+                    btn.disabled = false;
+                }
+            });
+        }
 
         // Upload Resume
         const resumeInput = document.getElementById('resumeUploadInput');

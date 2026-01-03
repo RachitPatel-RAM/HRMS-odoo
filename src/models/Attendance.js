@@ -23,6 +23,26 @@ const Attendance = sequelize.define('Attendance', {
     status: {
         type: DataTypes.ENUM('PRESENT', 'ABSENT', 'ON_LEAVE'),
         defaultValue: 'PRESENT'
+    },
+    lunch_duration: {
+        type: DataTypes.FLOAT, // In hours (e.g., 1.0 for 1 hour)
+        defaultValue: 0
+    },
+    total_hours: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0
+    },
+    overtime_hours: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0
+    },
+    overtime_status: {
+        type: DataTypes.ENUM('N/A', 'PENDING', 'APPROVED', 'REJECTED'),
+        defaultValue: 'N/A'
+    },
+    notes: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
 }, {
     tableName: 'attendance',

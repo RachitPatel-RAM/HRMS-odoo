@@ -32,7 +32,36 @@ exports.getDashboardData = async (req, res) => {
             order: [['first_name', 'ASC']]
         });
 
-        // ... (intermediate code for attendance/leave maps) ...
+        // 3. Fetch Today's Attendance
+        const attendances = await Attendance.findAll({
+            where: {
+                date: today
+            }
+        });
+
+        // 4. Fetch Active Leaves
+        const leaves = await Leave.findAll({
+            where: {
+                start_date: { [Op.lte]: today },
+                end_date: { [Op.gte]: today },
+                status: 'APPROVED'
+            }
+        });
+
+        // 5. Build Maps for O(1) Access
+        const activeAttendanceMap = new Map();
+        const latestAttendanceMap = new Map(); // Store full object for "Me"
+        attendances.forEach(att => {
+            if (!att.check_out_time) {
+                activeAttendanceMap.set(att.employee_id, true);
+            }
+            latestAttendanceMap.set(att.employee_id, att);
+        });
+
+        const leaveMap = new Map();
+        leaves.forEach(l => {
+            leaveMap.set(l.employee_id, true);
+        });
 
         // 6. Build Response List
         let employeeList = employees.map(emp => {

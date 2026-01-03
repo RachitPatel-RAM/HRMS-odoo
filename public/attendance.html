@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Employee Attendance View</title>
+    <link href="/css/output.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Gochi+Hand&amp;family=Spline+Sans:wght@400;600&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#9C27B0",
+                        "primary-dark": "#7B1FA2",
+                        "background-light": "#FFFFFF",
+                        "background-dark": "#1a1a1a",
+                        "paper-light": "#fdfbf7",
+                        "paper-dark": "#2d2d2d",
+                    },
+                    fontFamily: {
+                        display: ["'Gochi Hand'", "cursive"],
+                        body: ["'Gochi Hand'", "cursive"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "2px",
+                        'hand': '255px 15px 225px 15px / 15px 225px 15px 255px',
+                    },
+                    boxShadow: {
+                        'sketch': '2px 3px 0px 0px rgba(0,0,0,1)',
+                        'sketch-hover': '4px 5px 0px 0px rgba(0,0,0,1)',
+                        'sketch-dark': '2px 3px 0px 0px rgba(255,255,255,0.9)',
+                        'hand': '2px 3px 0px 0px rgba(0,0,0,1)',
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        .hand-border {
+            border: 2px solid black;
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px
+        }
+
+        .dark .hand-border {
+            border-color: #e5e5e5;
+        }
+
+        /* Dashboard-like Systray styles if needed */
+    </style>
+</head>
+
+<body
+    class="bg-white dark:bg-background-dark font-display text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-200">
+
+    <!-- DASHBOARD NAVBAR REUSE START -->
+    <header
+        class="sticky top-0 z-50 bg-white dark:bg-paper-dark border-b-2 border-black dark:border-white w-full px-4 py-3 flex items-center justify-between shadow-sm">
+        <div class="flex items-center gap-4">
+            <div class="cursor-pointer" onclick="window.location.href='/dashboard.html'">
+                <div
+                    class="hand-border bg-primary text-white p-2 px-4 font-bold text-xl tracking-wider transform -rotate-1 flex items-center justify-center">
+                    <span class="material-icons-outlined text-2xl">architecture</span>
+                    <span class="ml-2">HR.Sketch</span>
+                </div>
+            </div>
+        </div>
+        <nav class="hidden md:flex items-center gap-4">
+            <a class="hand-border bg-white dark:bg-paper-dark dark:text-white px-6 py-2 text-lg transform hover:-rotate-1 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all border-black dark:border-white"
+                href="/dashboard.html">
+                Employees
+            </a>
+            <a class="hand-border bg-primary text-white px-6 py-2 text-lg transform hover:rotate-1 transition-all shadow-hand border-black dark:border-white"
+                href="#">
+                Attendance
+            </a>
+            <a class="hand-border bg-white dark:bg-paper-dark dark:text-white px-6 py-2 text-lg transform hover:-rotate-1 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all border-black dark:border-white"
+                href="#">
+                Time Off
+            </a>
+        </nav>
+        <div class="flex items-center gap-4">
+            <!-- Systray (Copied from Dashboard) -->
+            <div id="attendanceSystray"
+                class="hidden lg:flex items-center gap-2 hand-border px-3 py-1 bg-white dark:bg-paper-dark border-black dark:border-white text-gray-900 dark:text-gray-100">
+                <span id="attStatusIcon" class="material-icons-outlined text-gray-400">schedule</span>
+                <div class="flex flex-col text-xs leading-tight">
+                    <span id="attStatusText" class="font-bold">Not Checked In</span>
+                    <span id="attTimer" class="text-gray-500 dark:text-gray-400">--:--</span>
+                </div>
+                <button id="attActionBtn"
+                    class="ml-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded text-sm font-bold hover:bg-gray-200 dark:hover:bg-gray-600">
+                    Loading
+                </button>
+            </div>
+
+            <div class="relative group">
+                <button
+                    class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border-2 border-black dark:border-white focus:outline-none focus:ring-2 focus:ring-primary">
+                    <img id="userAvatar" alt="User Avatar" class="w-full h-full object-cover"
+                        src="https://ui-avatars.com/api/?name=User&background=random" />
+                </button>
+                <div
+                    class="absolute right-0 mt-2 w-48 bg-white dark:bg-paper-dark border-2 border-black dark:border-white rounded-md shadow-hand opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all transform origin-top-right z-50">
+                    <a class="block px-4 py-2 text-lg hover:bg-purple-100 dark:hover:bg-purple-900"
+                        href="/profile.html">My
+                        Profile</a>
+                    <a id="logoutBtn" class="block px-4 py-2 text-lg hover:bg-purple-100 dark:hover:bg-purple-900"
+                        href="#">Log Out</a>
+                </div>
+            </div>
+            <button class="md:hidden p-2 text-gray-700 dark:text-gray-300">
+                <span class="material-icons-outlined text-3xl">menu</span>
+            </button>
+        </div>
+    </header>
+    <!-- DASHBOARD NAVBAR REUSE END -->
+
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold mb-2 relative inline-block">
+                Attendance
+                <svg class="absolute w-full h-3 -bottom-1 left-0 text-primary opacity-60" preserveAspectRatio="none"
+                    viewBox="0 0 100 10">
+                    <path d="M0 5 Q 50 10 100 5" fill="none" stroke="currentColor" stroke-width="3"></path>
+                </svg>
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400 text-xl mt-2">Track your daily check-ins and working hours.</p>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-6 mb-8 items-start lg:items-center justify-between">
+            <!-- Date Controls -->
+            <div class="flex items-center gap-3">
+                <button id="prevMonthBtn" aria-label="Previous Month"
+                    class="w-12 h-12 flex items-center justify-center bg-primary text-white border-2 border-black dark:border-white shadow-sketch dark:shadow-sketch-dark hover:shadow-sketch-hover dark:hover:shadow-none hover:-translate-y-0.5 transition-all text-2xl font-bold rounded-sm">
+                    &lt;
+                </button>
+                <div class="relative">
+                    <select id="monthSelect"
+                        class="appearance-none bg-primary text-white border-2 border-black dark:border-white px-8 py-2 pr-10 text-xl font-bold shadow-sketch dark:shadow-sketch-dark cursor-pointer outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary rounded-sm w-48 text-center">
+                        <option>Loading...</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-white">
+                        <span class="material-icons">expand_more</span>
+                    </div>
+                </div>
+                <!-- Need year select? Assume current year or logic handles it. Design shows Month dropdown only. I will make month select "Month YYYY". -->
+                <button id="nextMonthBtn" aria-label="Next Month"
+                    class="w-12 h-12 flex items-center justify-center bg-primary text-white border-2 border-black dark:border-white shadow-sketch dark:shadow-sketch-dark hover:shadow-sketch-hover dark:hover:shadow-none hover:-translate-y-0.5 transition-all text-2xl font-bold rounded-sm">
+                    &gt;
+                </button>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full lg:w-auto flex-grow lg:justify-end">
+                <div
+                    class="bg-white dark:bg-paper-dark border-2 border-black dark:border-white p-4 shadow-sm relative overflow-hidden group">
+                    <div
+                        class="absolute top-0 right-0 -mt-2 -mr-2 w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full z-0 group-hover:scale-150 transition-transform duration-500">
+                    </div>
+                    <div class="relative z-10 text-center">
+                        <div class="text-lg text-gray-600 dark:text-gray-300 font-bold mb-1">Count of days present</div>
+                        <div id="statPresent" class="text-3xl font-bold text-primary">--</div>
+                    </div>
+                </div>
+                <div
+                    class="bg-white dark:bg-paper-dark border-2 border-black dark:border-white p-4 shadow-sm relative overflow-hidden group">
+                    <div
+                        class="absolute top-0 right-0 -mt-2 -mr-2 w-8 h-8 bg-red-100 dark:bg-red-900 rounded-full z-0 group-hover:scale-150 transition-transform duration-500">
+                    </div>
+                    <div class="relative z-10 text-center">
+                        <div class="text-lg text-gray-600 dark:text-gray-300 font-bold mb-1">Leaves count</div>
+                        <div id="statLeaves" class="text-3xl font-bold text-red-500">--</div>
+                    </div>
+                </div>
+                <div
+                    class="bg-white dark:bg-paper-dark border-2 border-black dark:border-white p-4 shadow-sm relative overflow-hidden group">
+                    <div
+                        class="absolute top-0 right-0 -mt-2 -mr-2 w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full z-0 group-hover:scale-150 transition-transform duration-500">
+                    </div>
+                    <div class="relative z-10 text-center">
+                        <div class="text-lg text-gray-600 dark:text-gray-300 font-bold mb-1">Total working days</div>
+                        <div id="statWorkingDays" class="text-3xl font-bold text-green-600">--</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div
+            class="bg-white dark:bg-paper-dark border-2 border-black dark:border-white shadow-sketch dark:shadow-sketch-dark overflow-hidden rounded-sm mb-12">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse" id="attendanceTable">
+                    <thead>
+                        <tr class="bg-paper-light dark:bg-gray-800 border-b-2 border-black dark:border-white text-lg">
+                            <th class="p-4 font-bold border-r-2 border-black dark:border-white w-48">Date</th>
+                            <th class="p-4 font-bold border-r border-gray-300 dark:border-gray-600">Check In</th>
+                            <th class="p-4 font-bold border-r-2 border-black dark:border-white">Check Out</th>
+                            <th class="p-4 font-bold border-r border-gray-300 dark:border-gray-600 text-center">Work
+                                Hours</th>
+                            <th class="p-4 font-bold text-center">Extra hours</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-300 dark:divide-gray-600" id="tableBody">
+                        <tr>
+                            <td colspan="5" class="p-4 text-center">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div
+                class="bg-paper-light dark:bg-gray-800 p-4 border-t-2 border-black dark:border-white flex flex-wrap gap-4 text-sm justify-end">
+                <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                    <span>Extra Hours</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-gray-400"></div>
+                    <span>Standard Shift</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- Shared Systray Logic (Copied from dashboard.html) ---
+        const API_BASE = '/api';
+        let checkInTimer = null;
+        let checkInStartTime = null;
+
+        async function initSystray() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                // We need status. Using /dashboard api is heavy just for status. 
+                // Alternatively, use /attendance/me for today, or similar.
+                // Let's use dashboard for now as it returns everything needed including user profile.
+                const res = await fetch(`${API_BASE}/dashboard`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (res.ok) {
+                    const data = await res.json();
+                    updateProfile(data.me);
+                    updateSystray(data.attendance);
+                }
+            } catch (e) { console.error('Systray Error', e); }
+        }
+
+        function updateProfile(user) {
+            if (user.profile_picture) document.getElementById('userAvatar').src = user.profile_picture;
+        }
+
+        function updateSystray(attendance) {
+            const statusText = document.getElementById('attStatusText');
+            const timerEl = document.getElementById('attTimer');
+            const actionBtn = document.getElementById('attActionBtn');
+            const icon = document.getElementById('attStatusIcon');
+
+            if (checkInTimer) { clearInterval(checkInTimer); checkInTimer = null; }
+
+            if (!attendance || (attendance.check_out_time && attendance.check_in_time)) {
+                // Not Checked In OR Already Checked Out Today
+                statusText.innerText = 'Not Checked In';
+                actionBtn.innerText = 'Check In';
+                actionBtn.className = 'ml-2 bg-green-100 text-green-700 px-3 py-1 rounded text-sm font-bold hover:bg-green-200 border border-green-300';
+                actionBtn.onclick = () => doAttendanceAction('check-in');
+                timerEl.innerText = '--:--';
+                icon.className = 'material-icons-outlined text-gray-400';
+
+                // If checked out today, maybe disable or show "Done"? Requirements say "One Check In".
+                if (attendance && attendance.check_out_time) {
+                    statusText.innerText = 'Day Completed';
+                    actionBtn.innerText = 'Done';
+                    actionBtn.disabled = true;
+                    actionBtn.className = 'ml-2 bg-gray-100 text-gray-400 px-3 py-1 rounded text-sm font-bold cursor-not-allowed border border-gray-200';
+                    actionBtn.onclick = null;
+                    const diff = new Date(attendance.check_out_time) - new Date(attendance.check_in_time);
+                    timerEl.innerText = formatDuration(diff);
+                    icon.className = 'material-icons-outlined text-green-600';
+                }
+
+            } else {
+                // Checked In
+                statusText.innerText = 'Checked In';
+                actionBtn.innerText = 'Check Out';
+                actionBtn.className = 'ml-2 bg-red-100 text-red-700 px-3 py-1 rounded text-sm font-bold hover:bg-red-200 border border-red-300';
+                actionBtn.onclick = () => doAttendanceAction('check-out');
+
+                checkInStartTime = new Date(attendance.check_in_time);
+                startTimer();
+                icon.className = 'material-icons-outlined text-green-600 animate-pulse';
+            }
+        }
+
+        function startTimer() {
+            const timerEl = document.getElementById('attTimer');
+            checkInTimer = setInterval(() => {
+                const now = new Date();
+                const diff = now - checkInStartTime;
+                timerEl.innerText = formatDuration(diff);
+            }, 1000);
+        }
+
+        function formatDuration(ms) {
+            const seconds = Math.floor((ms / 1000) % 60);
+            const minutes = Math.floor((ms / (1000 * 60)) % 60);
+            const hours = Math.floor((ms / (1000 * 60 * 60)));
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        async function doAttendanceAction(type) {
+            const token = localStorage.getItem('token');
+            const url = type === 'check-in' ? '/api/attendance/check-in' : '/api/attendance/check-out';
+            try {
+                const res = await fetch(url, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                if (res.ok) {
+                    // Update systray but also RELOAD PAGE data because table might change if viewing current month
+                    await initSystray();
+                    loadMonth(currentDate);
+                } else {
+                    alert(data.message);
+                }
+            } catch (e) { console.error(e); alert('Network Error'); }
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        });
+
+        // --- Monthly View Logic ---
+
+        let currentDate = new Date(); // Start with today
+
+        async function initPage() {
+            await initSystray();
+            setupMonthSelect();
+            loadMonth(currentDate);
+
+            document.getElementById('prevMonthBtn').addEventListener('click', () => changeMonth(-1));
+            document.getElementById('nextMonthBtn').addEventListener('click', () => changeMonth(1));
+            document.getElementById('monthSelect').addEventListener('change', (e) => {
+                currentDate = new Date(e.target.value + "-01");
+                loadMonth(currentDate);
+            });
+        }
+
+        function setupMonthSelect() {
+            const select = document.getElementById('monthSelect');
+            select.innerHTML = '';
+            // Generate last 12 months + next month
+            const d = new Date();
+            d.setMonth(d.getMonth() - 11);
+
+            for (let i = 0; i < 13; i++) {
+                const val = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                const text = d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                const opt = document.createElement('option');
+                opt.value = val;
+                opt.innerText = text;
+                select.appendChild(opt);
+                d.setMonth(d.getMonth() + 1);
+            }
+        }
+
+        function changeMonth(delta) {
+            currentDate.setMonth(currentDate.getMonth() + delta);
+            loadMonth(currentDate);
+        }
+
+        async function loadMonth(date) {
+            const token = localStorage.getItem('token');
+            const monthStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+            // Sync Dropdown
+            document.getElementById('monthSelect').value = monthStr;
+
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-gray-500">Loading...</td></tr>';
+
+            try {
+                const res = await fetch(`${API_BASE}/attendance/me?month=${monthStr}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (res.ok) {
+                    const data = await res.json();
+                    renderData(data);
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-red-500">Error loading data</td></tr>';
+                }
+            } catch (e) {
+                console.error(e);
+                tableBody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-red-500">Network Error</td></tr>';
+            }
+        }
+
+        function renderData(data) {
+            const { summary, records } = data;
+
+            // Update Cards
+            document.getElementById('statPresent').innerText = String(summary.presentDays).padStart(2, '0');
+            document.getElementById('statLeaves').innerText = String(summary.leavesCount).padStart(2, '0');
+            document.getElementById('statWorkingDays').innerText = String(summary.totalWorkingDays).padStart(2, '0');
+
+            // Render Table
+            let html = '';
+            records.forEach(rec => {
+                let rowClass = "hover:bg-purple-50 dark:hover:bg-gray-700 transition-colors group";
+                if (rec.status === 'WEEKEND') rowClass = "bg-gray-50 dark:bg-gray-800/50";
+                if (rec.status === 'ABSENT' && !rec.isHighlight) rowClass = "bg-red-50 dark:bg-red-900/10"; // Subtle absent
+
+                html += `<tr class="${rowClass}">
+                    <td class="p-4 font-bold border-r-2 border-black dark:border-white whitespace-nowrap">
+                        <span class="block">${rec.displayDate}</span>
+                        <span class="text-sm text-gray-500 dark:text-gray-400 font-normal">${rec.dayName}</span>
+                    </td>
+                    <td class="p-4 border-r border-gray-300 dark:border-gray-600 text-xl group-hover:text-primary transition-colors ${rec.checkIn === '-' ? 'text-gray-400 italic' : ''}">
+                        ${rec.checkIn}
+                    </td>
+                    <td class="p-4 border-r-2 border-black dark:border-white text-xl group-hover:text-primary transition-colors ${rec.checkOut === '-' ? 'text-gray-400 italic' : ''}">
+                         ${rec.checkOut}
+                    </td>
+                    <td class="p-4 border-r border-gray-300 dark:border-gray-600 text-center font-bold text-xl ${rec.workHours === '-' ? 'text-gray-400 italic' : ''}">
+                         ${rec.workHours}
+                    </td>
+                    <td class="p-4 text-center font-bold text-xl flex items-center justify-center gap-1 ${rec.isHighlight ? 'text-green-600 dark:text-green-400' : 'text-gray-400 italic'}">
+                         ${rec.extraHours}
+                         ${rec.isHighlight ? '<span class="material-icons text-base">trending_up</span>' : ''}
+                    </td>
+                 </tr>`;
+            });
+
+            document.getElementById('tableBody').innerHTML = html;
+        }
+
+        initPage();
+
+    </script>
+</body>
+
+</html>

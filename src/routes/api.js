@@ -18,6 +18,8 @@ router.get('/dashboard', authenticate, require('../controllers/dashboardControll
 const attendanceController = require('../controllers/attendanceController');
 router.post('/attendance/check-in', authenticate, attendanceController.checkIn);
 router.post('/attendance/check-out', authenticate, attendanceController.checkOut);
+router.get('/attendance/weekly', authenticate, attendanceController.getWeeklyAttendance);
+router.get('/attendance/me', authenticate, attendanceController.getMyAttendance);
 
 // Profile Routes
 const profileRoutes = require('./profileRoutes');

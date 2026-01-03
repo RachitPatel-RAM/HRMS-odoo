@@ -10,7 +10,8 @@ async function startServer() {
         console.log('Database connection has been established successfully.');
 
         // Sync models (Safe for dev, use migrations for prod)
-        await sequelize.sync({ alter: true });
+        // Disabled auto-alter to prevent index duplication bugs. Use sync_db.js for updates.
+        await sequelize.sync({ alter: false });
 
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);

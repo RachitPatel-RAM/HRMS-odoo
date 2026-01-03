@@ -5,6 +5,8 @@ const Company = require('../models/Company');
 const EmployeeSkill = require('../models/EmployeeSkill');
 const EmployeeCertification = require('../models/EmployeeCertification');
 const ProfileEditHistory = require('../models/ProfileEditHistory');
+const Attendance = require('../models/Attendance'); // Added
+const Leave = require('../models/Leave'); // Added
 
 async function sync() {
     try {
@@ -31,14 +33,21 @@ async function sync() {
 
         const EmployeeExperience = require('../models/EmployeeExperience');
         await EmployeeExperience.sync({ alter: true });
+        console.log('EmployeeExperience model synced.');
 
         const EmployeeEducation = require('../models/EmployeeEducation');
         await EmployeeEducation.sync({ alter: true });
+        console.log('EmployeeEducation model synced.');
 
         const EmployeeResume = require('../models/EmployeeResume');
         await EmployeeResume.sync({ alter: true });
+        console.log('EmployeeResume model synced.');
 
-        console.log('Resume models synced.');
+        await Attendance.sync({ alter: true });
+        console.log('Attendance model synced.');
+
+        await Leave.sync({ alter: true }); // Ensure Leave is also synced
+        console.log('Leave model synced.');
 
         await User.sync({ alter: true });
         console.log('User model synced.');
