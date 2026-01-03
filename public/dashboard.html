@@ -43,7 +43,7 @@
                 Attendance
             </a>
             <a class="hand-border bg-white px-6 py-2 text-lg transform hover:-rotate-1 hover:bg-gray-50 transition-all"
-                href="#">
+                href="/timeoff.html">
                 Time Off
             </a>
         </nav>
@@ -118,6 +118,110 @@
             <!-- Dynamic Pagination Buttons -->
         </div>
     </main>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+    <div id="employeeModal"
+        class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div
+            class="bg-white rounded-lg shadow-sketch border-2 border-black w-full max-w-2xl overflow-hidden relative transform transition-all scale-100">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-black">
+                <span class="material-icons-outlined text-3xl">close</span>
+            </button>
+
+            <div class="p-8">
+                <div class="flex flex-col md:flex-row items-center gap-6 mb-8">
+                    <div
+                        class="w-32 h-32 rounded-full border-2 border-black p-1 bg-white shadow-hand overflow-hidden flex-shrink-0">
+                        <img id="modalAvatar" src="" class="w-full h-full object-cover rounded-full">
+                    </div>
+                    <div class="text-center md:text-left">
+                        <h2 id="modalName" class="text-3xl font-bold mb-1"></h2>
+                        <p id="modalDesignation" class="text-xl text-primary font-bold"></p>
+                        <span id="modalDept"
+                            class="inline-block mt-2 px-3 py-1 bg-gray-100 border border-gray-300 rounded-full text-sm"></span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-400 uppercase tracking-wider">Work
+                                Email</label>
+                            <p id="modalEmail" class="text-lg font-bold flex items-center gap-2">
+                                <span class="material-icons-outlined text-gray-400">email</span>
+                                <span class="break-all"></span>
+                            </p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-400 uppercase tracking-wider">Work
+                                Phone</label>
+                            <p id="modalPhone" class="text-lg font-bold flex items-center gap-2">
+                                <span class="material-icons-outlined text-gray-400">phone</span>
+                                <span></span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label
+                                class="block text-sm font-bold text-gray-400 uppercase tracking-wider">Manager</label>
+                            <p id="modalManager" class="text-lg font-bold flex items-center gap-2">
+                                <span class="material-icons-outlined text-gray-400">supervisor_account</span>
+                                <span></span>
+                            </p>
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-bold text-gray-400 uppercase tracking-wider">Location</label>
+                            <p id="modalLocation" class="text-lg font-bold flex items-center gap-2">
+                                <span class="material-icons-outlined text-gray-400">location_on</span>
+                                <span></span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-6 border-t-2 border-dashed border-black/10">
+                    <label class="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Professional
+                        Summary</label>
+                    <p id="modalAbout" class="text-gray-600 italic mb-6">Professional Summary</p>
+
+                    <button onclick="toggleFullProfile()" id="btnViewProfile"
+                        class="w-full py-3 border-2 border-black rounded-lg font-bold hover:bg-black hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center gap-2">
+                        <span>View Full Profile</span>
+                        <span class="material-icons-outlined">expand_more</span>
+                    </button>
+
+                    <div id="fullProfileDetails" class="hidden mt-6 space-y-8 animate-fade-in-down">
+                        <!-- Experience -->
+                        <div>
+                            <h3 class="text-xl font-bold font-hand mb-4 border-b-2 border-purple-200 inline-block">
+                                Experience</h3>
+                            <div id="modalExperienceList" class="space-y-4">
+                                <!-- Dynamic Item -->
+                            </div>
+                        </div>
+
+                        <!-- Education -->
+                        <div>
+                            <h3 class="text-xl font-bold font-hand mb-4 border-b-2 border-purple-200 inline-block">
+                                Education</h3>
+                            <div id="modalEducationList" class="space-y-4"></div>
+                        </div>
+
+                        <!-- Skills -->
+                        <div>
+                            <h3 class="text-xl font-bold font-hand mb-4 border-b-2 border-purple-200 inline-block">
+                                Skills</h3>
+                            <div id="modalSkillsList" class="flex flex-wrap gap-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer class="mt-12 py-6 border-t border-gray-300 text-center text-gray-500 text-lg">
         <p>© 2026 odoo HRMS. All rights reserved</p>
     </footer>
@@ -134,8 +238,16 @@
         async function loadDashboard() {
             try {
                 const token = localStorage.getItem('token');
+                const role = localStorage.getItem('userRole');
+
                 if (!token) {
                     window.location.href = '/login.html';
+                    return;
+                }
+
+                // Fast Pre-Check: Restrict Admin/HR
+                if (role === 'ADMIN' || role === 'HR') {
+                    window.location.href = '/admin-dashboard.html';
                     return;
                 }
 
@@ -155,6 +267,12 @@
                 const data = await response.json();
                 console.log('Dashboard API Response:', data); // DEBUG: Check me.profile_picture
                 currentUser = data.me;
+
+                // Restrict Admin/HR from accessing Employee Dashboard
+                if (currentUser.role === 'ADMIN' || currentUser.role === 'HR') {
+                    window.location.href = '/admin-dashboard.html';
+                    return;
+                }
 
                 // Safe handling of employees array
                 if (data.employees && Array.isArray(data.employees)) {
@@ -211,9 +329,7 @@
 
                 const card = document.createElement('div');
                 card.className = `group bg-white hand-border p-6 relative cursor-pointer hover:-translate-y-1 hover:shadow-hand-hover transition-all duration-300 ${isMe ? 'ring-4 ring-primary ring-opacity-50' : ''}`;
-
-                // Add staggered animation delay
-                // card.style.animationDelay = `${index * 50}ms`;
+                card.onclick = () => openEmployeeModal(emp.id);
 
                 card.innerHTML = `
                     <div class="absolute top-4 right-4" title="${statusTitle}">
@@ -253,6 +369,71 @@
             }
         }
 
+        async function openEmployeeModal(id) {
+            const token = localStorage.getItem('token');
+            try {
+                // Show loading state or skeleton? Fast API, maybe just wait.
+                const res = await fetch(`/api/employees/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!res.ok) throw new Error('Failed to load profile');
+                const data = await res.json();
+                const emp = data.employee;
+
+                // Populate Modal
+                const avatarUrl = emp.profile_picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(emp.first_name + ' ' + emp.last_name)}&background=random`;
+                document.getElementById('modalAvatar').src = avatarUrl;
+                document.getElementById('modalName').innerText = `${emp.first_name} ${emp.last_name}`;
+                document.getElementById('modalDesignation').innerText = emp.designation || 'N/A';
+                document.getElementById('modalDept').innerText = emp.department || 'General';
+
+                // Use User email if available (joined), else fallback or N/A
+                const email = (emp.User && emp.User.email) ? emp.User.email : (emp.personal_email || 'N/A');
+                // Note: personal_email might be sensitive, but if User email is missing, what to show?
+                // User requirement: "No Sensitive Info". Personal Email is kinda sensitive. 
+                // We preferred User.email (Work Email). If not present, maybe show "N/A" to be safe.
+                document.querySelector('#modalEmail span.break-all').innerText = (emp.User && emp.User.email) ? emp.User.email : 'Not Public';
+
+                document.querySelector('#modalPhone span:last-child').innerText = emp.phone || 'N/A';
+                document.querySelector('#modalManager span:last-child').innerText = emp.manager_name || 'N/A';
+                document.querySelector('#modalLocation span:last-child').innerText = emp.location || 'N/A';
+                document.getElementById('modalAbout').innerText = emp.about || 'Professional Summary';
+
+                // Show Modal
+                const modal = document.getElementById('employeeModal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+
+            } catch (e) {
+                console.error(e);
+                alert('Error loading employee details');
+            }
+        }
+
+        window.closeModal = function () {
+            const modal = document.getElementById('employeeModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function toggleFullProfile() {
+            const details = document.getElementById('fullProfileDetails');
+            const btn = document.getElementById('btnViewProfile');
+            const icon = btn.querySelector('.material-icons-outlined');
+            const text = btn.querySelector('span:first-child');
+
+            if (details.classList.contains('hidden')) {
+                details.classList.remove('hidden');
+                text.innerText = 'Hide Full Profile';
+                icon.innerText = 'expand_less';
+            } else {
+                details.classList.add('hidden');
+                text.innerText = 'View Full Profile';
+                icon.innerText = 'expand_more';
+            }
+        }
+
         function updateSystray(attendance, me) {
             const container = document.getElementById('attendanceSystray');
             const icon = document.getElementById('attStatusIcon');
@@ -261,10 +442,24 @@
             const btn = document.getElementById('attActionBtn');
             const avatar = document.getElementById('userAvatar');
 
-            // Update Avatar
             if (me) {
                 const avatarUrl = me.profile_picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(me.name || 'User')}&background=random`;
                 avatar.src = avatarUrl;
+            }
+
+            const showExtraBtn = checkExtraHourEligibility(attendance);
+
+            // Clean up old button if exists
+            const existingBtn = document.getElementById('extraHourBtn');
+            if (existingBtn) existingBtn.remove();
+
+            if (showExtraBtn) {
+                const extraBtn = document.createElement('button');
+                extraBtn.id = 'extraHourBtn';
+                extraBtn.className = 'ml-2 bg-purple-600 text-white px-3 py-1 rounded text-sm font-bold hover:bg-purple-700 shadow-sketch animate-pulse';
+                extraBtn.innerHTML = '<span class="material-icons-outlined text-sm align-middle mr-1">timer</span> Extra Hour';
+                extraBtn.onclick = activateExtraHour;
+                container.appendChild(extraBtn);
             }
 
             container.classList.remove('hidden', 'lg:flex');
@@ -308,9 +503,124 @@
             }
         }
 
+        async function activateExtraHour() {
+            const btn = document.getElementById('extraHourBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = 'Activating...';
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch('/api/attendance/extra-time', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    showToast('Extra hours activated for 2 hours!', 'success');
+                    loadDashboard();
+                } else {
+                    showToast(data.message || 'Failed to activate', 'error');
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerText = 'Extra Hour';
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+                showToast('Network Error', 'error');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = 'Extra Hour';
+                }
+            }
+        }
+
+        function checkExtraHourEligibility(attendance) {
+            if (!attendance || !attendance.check_in_time || attendance.check_out_time) return false;
+
+            const checkIn = new Date(attendance.check_in_time);
+            const now = new Date();
+            const diffHours = (now - checkIn) / (1000 * 60 * 60);
+
+            // Logic: Visible if > 6.5h into shift OR > 1.5h into active block
+            // Simplified: If > 6.5h AND (No Active Block OR Active Block ending soon)
+
+            if (diffHours < 6.5) return false;
+
+            const allocations = attendance.extra_allocations || []; // Assuming backend sends this
+            // We need to parse if string? Backend sends JSON usually.
+
+            // Find last block
+            let lastEnd = null;
+            if (Array.isArray(allocations) && allocations.length > 0) {
+                const last = allocations[allocations.length - 1];
+                lastEnd = new Date(last.end);
+            }
+
+            if (!lastEnd) {
+                // No extra hours yet, and we are past 6.5h -> Eloigible
+                return true;
+            }
+
+            // If we have a block, is it ending soon? (Within 30 mins of end)
+            const msUntilEnd = lastEnd - now;
+            const minsUntilEnd = msUntilEnd / (1000 * 60);
+
+            if (minsUntilEnd <= 30 && minsUntilEnd > -120) {
+                // Visible 30 mins before end, and keeps being visible for 2 hours after end (grace period to reactivate?)
+                // User said: "IF USER FORGOTE TO CHECK OUT EXTRA HOURS THEN WITH IN 2 HR THEY WILL AUTOMATICALLY STOP BUT STILL USER IS IN WORK THEN BEFORE 30 MINUTE OF ENDING 2HR USER AGAIN HAVE TO CLICK"
+                return true;
+            }
+
+            return false;
+        }
+
+
+        // ... (Existing Data State) ...
+
+        // Toast Notification System
+        function showToast(message, type = 'error') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+
+            // Colors based on type
+            const bgClass = type === 'success' ? 'bg-green-600' : 'bg-red-600';
+            const icon = type === 'success' ? 'check_circle' : 'error_outline';
+
+            toast.className = `${bgClass} text-white px-6 py-4 rounded shadow-2xl flex items-center gap-3 transform transition-all duration-300 translate-y-10 opacity-0`;
+            toast.innerHTML = `
+                <span class="material-icons-outlined text-2xl">${icon}</span>
+                <span class="font-bold text-lg">${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            // Animate In
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-10', 'opacity-0');
+            });
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-10');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
         async function doAttendance(action) {
             try {
                 const token = localStorage.getItem('token');
+                const btn = document.getElementById('attActionBtn');
+                const originalText = btn.innerText;
+                btn.disabled = true;
+                btn.innerText = 'Processing...';
+
                 const response = await fetch(`/api/attendance/${action}`, {
                     method: 'POST',
                     headers: {
@@ -319,13 +629,21 @@
                     }
                 });
 
+                const data = await response.json();
+
                 if (response.ok) {
+                    showToast(data.message || 'Success', 'success');
                     loadDashboard(); // Reload to update UI
                 } else {
-                    alert('Attendance Action Failed');
+                    // Show specific error from backend
+                    showToast(data.message || 'Action Failed', 'error');
                 }
             } catch (e) {
                 console.error(e);
+                showToast('Network error occurred', 'error');
+            } finally {
+                // Button state will be reset by updateSystray or we can reset here if needed
+                // But loadDashboard will re-render systray, so it's fine.
             }
         }
 

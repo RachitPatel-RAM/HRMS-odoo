@@ -1,13 +1,434 @@
 <!DOCTYPE html>
-<html>
+<html class="" lang="en">
 
 <head>
-    <title>Admin Dashboard</title>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Admin Dashboard - HRMS</title>
+    <link href="/css/output.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Gochi+Hand&amp;family=Spline+Sans:wght@400;600&amp;display=swap"
+        rel="stylesheet" />
+    <style>
+        @font-face {
+            font-family: 'Gochi Hand';
+            src: url('/fonts/gochi.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        .hand-border {
+            border: 2px solid black;
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px
+        }
+
+        .hand-input {
+            border: 2px solid black;
+            border-radius: 255px 25px 225px 25px / 25px 225px 25px 255px;
+        }
+
+        /* Custom Scrollbar for consistent feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
 </head>
 
-<body>
-    <h1>Welcome Admin</h1>
-    <p>You have successfully logged in.</p>
+<body
+    class="bg-background-light text-gray-900 font-display antialiased transition-colors duration-200 flex flex-col min-h-screen">
+    <div class="texture-overlay"></div>
+    <header
+        class="sticky top-0 z-50 bg-white border-b-2 border-black px-6 py-2 flex justify-between items-center shadow-md relative">
+        <!-- Left: Logo -->
+        <div class="flex items-center gap-3">
+            <div class="flex items-center justify-center p-1">
+                <img src="/assets/logg_odooHRMS.png" alt="Odoo Logo" class="h-20 w-20 object-contain">
+            </div>
+            <!-- <span class="text-2xl font-bold tracking-tight">Odoo HRMS</span> -->
+        </div>
+
+        <!-- Center: Navigation -->
+        <nav class="hidden md:flex items-center gap-6 absolute left-1/2 transform -translate-x-1/2">
+            <a href="/admin-dashboard.html"
+                class="bg-primary text-white px-6 py-2 text-xl font-bold border-2 border-black transform -rotate-1 shadow-[2px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all rounded-sm font-hand">
+                Employees
+            </a>
+            <a href="/admin_attendance.html"
+                class="bg-white text-black px-6 py-2 text-xl font-bold border-2 border-black transform rotate-1 shadow-[2px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:bg-gray-50 transition-all rounded-sm font-hand">
+                Attendance
+            </a>
+            <a href="/admin_timeoff.html"
+                class="bg-white text-black px-6 py-2 text-xl font-bold border-2 border-black transform -rotate-1 shadow-[2px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:bg-gray-50 transition-all rounded-sm font-hand">
+                Time Off
+            </a>
+            <a href="/admin_hr_management.html" id="nav-hr-management"
+                class="bg-white text-black px-6 py-2 text-xl font-bold border-2 border-black transform rotate-1 shadow-[2px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:bg-gray-50 transition-all rounded-sm font-hand">
+                HR Management
+            </a>
+        </nav>
+
+        <!-- Right: Avatar -->
+        <div class="hidden md:flex items-center gap-4">
+            <button class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                <span class="material-icons-outlined text-2xl">notifications</span>
+            </button>
+            <div class="relative group">
+                <button
+                    class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border-2 border-black focus:outline-none focus:ring-2 focus:ring-primary">
+                    <img id="userAvatar" alt="User Avatar" class="w-full h-full object-cover"
+                        src="https://ui-avatars.com/api/?name=Admin&background=random" />
+                </button>
+                <div
+                    class="absolute right-0 mt-2 w-48 bg-white border-2 border-black rounded-md shadow-hand opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all transform origin-top-right z-50">
+                    <a class="block px-4 py-2 text-lg hover:bg-purple-100" href="/admin_profile.html">My Profile</a>
+                    <a id="logoutBtn" class="block px-4 py-2 text-lg hover:bg-purple-100 text-red-600" href="#">Log
+                        Out</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 max-w-6xl flex-grow">
+        <!-- Status Legend - Maybe irrelevant for Admin viewing list, but useful context -->
+        <div
+            class="bg-white border-2 border-black rounded-lg p-4 mb-8 shadow-hand hidden md:flex justify-around items-center gap-4">
+            <div class="flex items-center gap-2">
+                <div class="w-4 h-4 bg-green-500 rounded-full border border-black shadow-sm"></div>
+                <span class="font-bold text-sm">Present</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="material-icons-outlined text-blue-500 transform rotate-45 text-sm">flight</span>
+                <span class="font-bold text-sm">On Leave</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="w-4 h-4 bg-yellow-400 rounded-full border border-black shadow-sm"></div>
+                <span class="font-bold text-sm">Absent</span>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <div class="flex items-center gap-4">
+                <h1 class="text-3xl font-bold">Manage Employees</h1>
+            </div>
+            <div class="w-full md:w-1/2 relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <span class="material-icons-outlined text-gray-400">search</span>
+                </span>
+                <input
+                    class="w-full pl-10 pr-4 py-3 hand-input bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-lg placeholder-gray-400 shadow-sm"
+                    placeholder="Search by name, dept..." type="text" id="searchInput" />
+            </div>
+        </div>
+
+        <div id="employeeGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="text-center w-full col-span-3">Loading Employees...</div>
+        </div>
+
+        <div id="pagination_container" class="flex justify-center mt-12 gap-2">
+            <!-- Dynamic Pagination Buttons -->
+        </div>
+    </main>
+    <footer class="mt-12 py-6 border-t border-gray-300 text-center text-gray-500 text-lg">
+        <p>© 2026 odoo HRMS. All rights reserved</p>
+    </footer>
+
+    <!-- Preserved Logic -->
+    <script>
+        // Data State
+        let allEmployees = [];
+        let filteredEmployees = [];
+        let currentPage = 1;
+        const itemsPerPage = 6;
+        let currentUser = null;
+
+        // Main Dashboard Logic
+        async function loadDashboard() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                const response = await fetch('/api/dashboard', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.status === 401 || response.status === 403 || response.status === 404) {
+                    console.log("Auth error or profile not found, redirecting...");
+                    localStorage.removeItem('token');
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                const data = await response.json();
+
+                currentUser = data.me;
+
+                // Hide HR Management menu for HR role
+                if (currentUser.role === 'HR') {
+                    const hrLink = document.getElementById('nav-hr-management');
+                    if (hrLink) hrLink.style.display = 'none';
+                }
+
+                // Safe handling of employees array
+                if (data.employees && Array.isArray(data.employees)) {
+                    allEmployees = data.employees;
+                    filteredEmployees = allEmployees; // Init filter
+                    currentPage = 1;
+                    renderEmployees();
+                } else {
+                    document.getElementById('employeeGrid').innerHTML = '<div class="text-center w-full col-span-3">No employees found.</div>';
+                }
+
+                updateSystray(data.attendance, data.me);
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                document.getElementById('employeeGrid').innerHTML = '<div class="text-center w-full col-span-3 text-red-500">Failed to load data.</div>';
+            }
+        }
+
+        // Search Logic
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            filteredEmployees = allEmployees.filter(emp =>
+                emp.name.toLowerCase().includes(term) ||
+                (emp.department && emp.department.toLowerCase().includes(term)) ||
+                (emp.designation && emp.designation.toLowerCase().includes(term))
+            );
+            currentPage = 1;
+            renderEmployees();
+        });
+
+        // Consolidate duplicate loadDashboard function logic
+        // Removed duplicate loadDashboard function definition here
+
+
+        function renderEmployees() {
+            const grid = document.getElementById('employeeGrid');
+            const paginationContainer = document.getElementById('pagination_container');
+
+            grid.innerHTML = '';
+            paginationContainer.innerHTML = '';
+
+            if (filteredEmployees.length === 0) {
+                grid.innerHTML = '<div class="text-center w-full col-span-3">No matching employees found.</div>';
+                return;
+            }
+
+            // Pagination Logic
+            const totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const currentItems = filteredEmployees.slice(startIndex, endIndex);
+
+            currentItems.forEach(emp => {
+                const isMe = currentUser && emp.id === currentUser.employeeId;
+
+                // Status Logic
+                let statusIcon = '';
+                let statusTitle = '';
+
+                if (emp.status === 'PRESENT') {
+                    statusIcon = '<div class="w-4 h-4 bg-green-500 rounded-full border border-black shadow-sm"></div>';
+                    statusTitle = 'Present (Checked In)';
+                } else if (emp.status === 'ON_LEAVE') {
+                    statusIcon = '<span class="material-icons-outlined text-blue-500 transform rotate-45">flight</span>';
+                    statusTitle = 'On Leave (Approved)';
+                } else {
+                    statusIcon = '<div class="w-4 h-4 bg-yellow-400 rounded-full border border-black shadow-sm"></div>';
+                    statusTitle = 'Absent';
+                }
+
+                const card = document.createElement('div');
+                // Added onclick to navigate to profile
+                card.onclick = () => {
+                    window.location.href = `/employee_profile.html?id=${emp.id}`;
+                };
+
+                card.className = `group bg-white hand-border p-6 relative cursor-pointer hover:-translate-y-1 hover:shadow-hand-hover transition-all duration-300 ${isMe ? 'ring-4 ring-primary ring-opacity-50' : ''}`;
+
+                card.innerHTML = `
+                    <div class="absolute top-4 right-4" title="${statusTitle}">
+                        ${statusIcon}
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="w-24 h-24 mb-4 rounded-full overflow-hidden border-2 border-black p-1 bg-white">
+                            <img alt="${emp.name}" class="w-full h-full object-cover rounded-full" 
+                                src="${emp.profile_picture || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(emp.name) + '&background=random'}" />
+                        </div>
+                        <h3 class="text-2xl font-bold mb-1 text-center group-hover:text-primary transition-colors">
+                            ${emp.name} ${isMe ? '(You)' : ''}
+                        </h3>
+                        <p class="text-gray-500 text-lg">${emp.designation || 'Employee'}</p>
+                        <div class="mt-4 flex gap-2">
+                             <span class="px-2 py-1 text-sm border border-gray-300 rounded-lg bg-gray-50">${emp.department || 'General'}</span>
+                        </div>
+                         <div class="mt-4 w-full opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity text-center text-primary font-bold text-sm">
+                            Click to Manage
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            // Render Pagination Buttons
+            if (totalPages > 1) {
+                for (let i = 1; i <= totalPages; i++) {
+                    const btn = document.createElement('button');
+                    const isActive = i === currentPage;
+                    btn.className = `w-10 h-10 flex items-center justify-center hand-border text-lg transition-all ${isActive ? 'bg-primary text-white' : 'bg-white hover:bg-gray-100'}`;
+                    btn.innerText = i;
+                    btn.onclick = () => {
+                        currentPage = i;
+                        renderEmployees();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    };
+                    paginationContainer.appendChild(btn);
+                }
+            }
+        }
+
+        function updateSystray(attendance, me) {
+            const container = document.getElementById('attendanceSystray');
+            if (!container) return;
+
+            const icon = document.getElementById('attStatusIcon');
+            const text = document.getElementById('attStatusText');
+            const timer = document.getElementById('attTimer');
+            const btn = document.getElementById('attActionBtn');
+            const avatar = document.getElementById('userAvatar');
+
+            // Update Avatar
+            if (me) {
+                const avatarUrl = me.profile_picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(me.name || 'User')}&background=random`;
+                avatar.src = avatarUrl;
+            }
+
+            container.classList.remove('hidden', 'lg:flex');
+            container.classList.add('flex');
+
+            if (attendance && attendance.check_in_time && !attendance.check_out_time) {
+                // Checked In
+                icon.innerText = 'check_circle';
+                icon.className = 'material-icons-outlined text-green-600';
+                text.innerText = 'Checked In';
+
+                const time = new Date(attendance.check_in_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                timer.innerText = `Since ${time}`;
+
+                btn.innerText = 'Check Out';
+                btn.className = 'ml-2 bg-red-100 text-red-600 px-2 py-1 rounded text-sm font-bold hover:bg-red-200';
+                btn.onclick = () => doAttendance('check-out');
+            } else if (attendance && attendance.check_out_time) {
+                // Checked Out (Session Closed) - Allow Re-Check In
+                icon.innerText = 'history';
+                icon.className = 'material-icons-outlined text-gray-500';
+                text.innerText = 'Checked Out';
+
+                const time = new Date(attendance.check_out_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                timer.innerText = `At ${time}`;
+
+                btn.innerText = 'Check In';
+                btn.disabled = false;
+                btn.className = 'ml-2 bg-green-100 text-green-600 px-2 py-1 rounded text-sm font-bold hover:bg-green-200';
+                btn.onclick = () => doAttendance('check-in');
+            } else {
+                // Not Checked In
+                icon.innerText = 'schedule';
+                icon.className = 'material-icons-outlined text-gray-400';
+                text.innerText = 'Not Checked In';
+                timer.innerText = '--:--';
+
+                btn.innerText = 'Check In';
+                btn.className = 'ml-2 bg-green-100 text-green-600 px-2 py-1 rounded text-sm font-bold hover:bg-green-200';
+                btn.onclick = () => doAttendance('check-in');
+            }
+        }
+
+        async function doAttendance(action) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/api/attendance/${action}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    loadDashboard(); // Reload to update UI
+                } else {
+                    alert('Attendance Action Failed');
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        });
+
+        // Idle Timeout Logic
+        let idleTimer;
+        // const IDLE_LIMIT = 15 * 60 * 1000; // 15 Minutes
+        /* 
+           Disabled auto-logout on Admin Dashboard to prevent annoyance during management tasks, 
+           or keep it but maybe longer? Kept same logic for consistency, but maybe Admin wants to stay on longer.
+           Let's keep it consistent for security.
+        */
+        const IDLE_LIMIT = 30 * 60 * 1000; // 30 Minutes for Admin
+
+        function resetIdleTimer() {
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => {
+                alert('You have been logged out due to inactivity.');
+                localStorage.removeItem('token');
+                window.location.href = '/login.html';
+            }, IDLE_LIMIT);
+        }
+
+        ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(evt => {
+            window.addEventListener(evt, resetIdleTimer);
+        });
+        resetIdleTimer();
+
+        // Mobile Menu Toggle
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+        if (mobileBtn) {
+            mobileBtn.addEventListener('click', () => {
+                const nav = document.getElementById('navbar');
+                if (nav.classList.contains('hidden')) {
+                    nav.classList.remove('hidden');
+                    nav.classList.add('flex');
+                } else {
+                    nav.classList.add('hidden');
+                    nav.classList.remove('flex');
+                }
+            });
+        }
+
+        // Init
+        loadDashboard();
+    </script>
 </body>
 
 </html>

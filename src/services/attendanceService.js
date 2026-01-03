@@ -8,18 +8,15 @@ class AttendanceService {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        // Check for existing session today (OPEN or CLOSED)
-        // User rule: "One Check In + One Check Out per day"
-        // So if any record exists for today, block it.
-        const existing = await Attendance.findOne({
+        const activeSession = await Attendance.findOne({
             where: {
                 employee_id: employeeId,
-                date: today
+                check_out_time: null
             }
         });
 
-        if (existing) {
-            throw new Error('You have already checked in today.');
+        if (activeSession) {
+            throw new Error('You are already checked in.');
         }
 
         const attendance = await Attendance.create({
@@ -30,10 +27,68 @@ class AttendanceService {
             lunch_duration: 1.0, // Default 1 hour policy
             total_hours: 0,
             overtime_hours: 0,
-            overtime_status: 'N/A'
+            overtime_status: 'N/A',
+            extra_allocations: [] // Initialize empty array
         });
 
         return attendance;
+    }
+
+    // Request Extra Time
+    async requestExtraTime(employeeId) {
+        const attendance = await Attendance.findOne({
+            where: {
+                employee_id: employeeId,
+                check_out_time: null
+            }
+        });
+
+        if (!attendance) {
+            throw new Error('No active session found.');
+        }
+
+        const now = new Date();
+
+        // Validation: Cannot request if recently requested (simple check could be added here)
+        // But logic says just button appears.
+
+        let allocations = attendance.extra_allocations || [];
+        // Ensure allocations is an array (sequelize JSON parsing)
+        if (typeof allocations === 'string') allocations = JSON.parse(allocations);
+
+        // Define Start Time
+        // If this is the first allocation, start from max(now, checkIn + 7h)? 
+        // Plan says: If click < 7h -> Block [7h, 9h]. If click > 7h -> Block [Now, Now+2h]
+
+        const checkIn = new Date(attendance.check_in_time);
+        const sevenHoursLater = new Date(checkIn.getTime() + 7 * 60 * 60 * 1000); // 7 hours work
+
+        let startTime;
+        if (now < sevenHoursLater) {
+            startTime = sevenHoursLater;
+        } else {
+            startTime = now;
+        }
+
+        // Define End Time (Start + 2h)
+        const twoHours = 2 * 60 * 60 * 1000;
+        const endTime = new Date(startTime.getTime() + twoHours);
+
+        // Add to allocations
+        allocations.push({
+            start: startTime.toISOString(),
+            end: endTime.toISOString()
+        });
+
+        attendance.extra_allocations = allocations;
+        // status might change to indicate OT active? Not strictly needed if we just track time.
+
+        await attendance.save();
+
+        return {
+            message: 'Extra hours authorized.',
+            block: { start: startTime, end: endTime }
+        };
     }
 
     // Check Out
@@ -44,9 +99,9 @@ class AttendanceService {
         const attendance = await Attendance.findOne({
             where: {
                 employee_id: employeeId,
-                date: today,
                 check_out_time: null
-            }
+            },
+            order: [['check_in_time', 'DESC']]
         });
 
         if (!attendance) {
@@ -56,30 +111,72 @@ class AttendanceService {
         const checkOutTime = new Date();
         attendance.check_out_time = checkOutTime;
 
-        // Calculations
+        // --- CALCULATION LOGIC ---
         const checkInTime = new Date(attendance.check_in_time);
-        const diffMs = checkOutTime - checkInTime;
-        const diffHours = diffMs / (1000 * 60 * 60); // Total duration in hours
+        const allocations = attendance.extra_allocations || [];
 
-        // Lunch Deduction (Fixed 1hr for now)
-        // In real world, user might input lunch, but requirement says "Lunch duration defaulted"
-        const lunch = 1.0;
-        attendance.lunch_duration = lunch;
+        // 1. Calculate Raw Duration
+        // We will sum up minute by minute? Or intervals.
+        // Simplified Logic: 
+        // Regular Time = Time worked within [CheckIn, CheckIn + 7h] - Lunch
+        // Extra Time = Time worked that overlaps with [Allocations]
 
-        let workingHours = diffHours - lunch;
-        if (workingHours < 0) workingHours = 0;
+        // Lunch deduction logic needs to be robust. 
+        // Assuming lunch is taken during the first 7 hours.
+        const LUNCH_HOURS = 1.0;
 
-        attendance.total_hours = parseFloat(workingHours.toFixed(2));
+        const sevenHoursMs = 7 * 60 * 60 * 1000;
+        const standardEnd = new Date(checkInTime.getTime() + sevenHoursMs);
 
-        // OT Calculation (Threshold: 9 hours)
-        const STANDARD_HOURS = 9.0;
-        if (workingHours > STANDARD_HOURS) {
-            attendance.overtime_hours = parseFloat((workingHours - STANDARD_HOURS).toFixed(2));
+        // A. Regular Hours Calculation
+        // Active worked interval for regular: [CheckIn, Min(CheckOut, StandardEnd)]
+        let regularEnd = (checkOutTime < standardEnd) ? checkOutTime : standardEnd;
+        let regularMs = regularEnd - checkInTime;
+        if (regularMs < 0) regularMs = 0;
+
+        let regularHours = regularMs / (1000 * 60 * 60);
+        regularHours = Math.max(0, regularHours - LUNCH_HOURS);
+
+        // B. Extra Hours Calculation
+        let extraMs = 0;
+
+        // For each allocation, find overlap with actual work interval [StandardEnd, CheckOut]
+        // Note: Actual work interval for OT starts effectively after StandardEnd? 
+        // Or specific to allocation blocks?
+        // Logic: "Block covers [7h, 9h]" -> Logic implies OT counts ONLY if in block.
+        // So we intersect [CheckIn, CheckOut] with [BlockStart, BlockEnd].
+        // And we subtract any overlap with Regular Time?
+        // Actually, if blocks Start >= StandardEnd, no overlap with regular.
+
+        if (Array.isArray(allocations)) {
+            for (const block of allocations) {
+                const bStart = new Date(block.start);
+                const bEnd = new Date(block.end);
+
+                // Intersection of [bStart, bEnd] AND [CheckIn, CheckOut]
+                const start = (checkInTime > bStart) ? checkInTime : bStart;
+                const end = (checkOutTime < bEnd) ? checkOutTime : bEnd;
+
+                if (end > start) {
+                    extraMs += (end - start);
+                }
+            }
+        }
+
+        const extraHours = extraMs / (1000 * 60 * 60);
+
+        // Update Fields
+        attendance.total_hours = parseFloat((regularHours + extraHours).toFixed(2));
+        attendance.overtime_hours = parseFloat(extraHours.toFixed(2));
+
+        if (extraHours > 0) {
             attendance.overtime_status = 'PENDING';
         } else {
-            attendance.overtime_hours = 0;
             attendance.overtime_status = 'N/A';
         }
+
+        // Just to be safe store lunch
+        attendance.lunch_duration = LUNCH_HOURS;
 
         await attendance.save();
 
@@ -193,21 +290,21 @@ class AttendanceService {
                     record.checkOut = new Date(att.check_out_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }); // 19:00
                 }
 
-                // Format Work Hours (float to HH:MM)
+                // Format Work Hours (float to Xh Ym)
                 if (att.total_hours > 0) {
                     const h = Math.floor(att.total_hours);
                     const m = Math.round((att.total_hours - h) * 60);
-                    record.workHours = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+                    record.workHours = `${h}h ${m}m`;
                 }
 
                 // Format Extra Hours
                 if (att.overtime_hours > 0) {
                     const h = Math.floor(att.overtime_hours);
                     const m = Math.round((att.overtime_hours - h) * 60);
-                    record.extraHours = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+                    record.extraHours = `${h}h ${m}m`;
                     record.isHighlight = true;
                 } else {
-                    record.extraHours = '00:00';
+                    record.extraHours = '0h 00m';
                 }
             }
 

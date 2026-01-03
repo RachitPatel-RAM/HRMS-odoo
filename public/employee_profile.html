@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html class="" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Admin Employee Profile Management</title>
+    <!-- Use local Output CSS -->
+    <link href="/css/output.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&amp;display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <script src="/js/toast.js"></script>
+
+    <style>
+        /* Standard CSS for Custom Classes */
+        body {
+            font-family: "Gochi Hand", cursive;
+            background-color: #ffffff;
+        }
+
+        .sketchy-input {
+            border: 2px solid #000;
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+            transition: all 0.3s ease;
+        }
+
+        .dark .sketchy-input {
+            border-color: #fff;
+        }
+
+        .sketchy-input:focus {
+            outline: none;
+            border-color: #9C27B0;
+            /* Primary Color */
+            box-shadow: 0 0 0 2px rgba(156, 39, 176, 0.2);
+        }
+
+        .sketchy-input:disabled {
+            background-color: #f3f4f6;
+            cursor: not-allowed;
+            border-color: #d1d5db;
+        }
+
+        .sketchy-box {
+            border: 2px solid #000;
+            border-radius: 4px;
+        }
+
+        .dark .sketchy-box {
+            border-color: #fff;
+        }
+
+        .dashed-hand-drawn-border {
+            border: 2px dashed #000;
+            border-image: url("data:image/svg+xml,%3Csvg width='10' height='10' viewBox='0 0 10 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L9 9M9 1L1 9' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") 2 / 2px;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .dark .dashed-hand-drawn-border {
+            border: 2px dashed #fff;
+            border-image: url("data:image/svg+xml,%3Csvg width='10' height='10' viewBox='0 0 10 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L9 9M9 1L1 9' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") 2 / 2px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+            border: 2px solid #f1f1f1;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .read-only-hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body class="bg-white text-black transition-colors duration-300">
+    <nav class="border-b-2 border-black bg-white px-6 py-4 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between">
+            <div class="flex items-center space-x-2 cursor-pointer" id="navLogoBtn">
+                <div
+                    class="w-10 h-10 bg-[#7B61FF] rounded-lg flex items-center justify-center text-white font-bold text-xl border-2 border-black transform -rotate-2">
+                    <img src="/assets/logg_odooHRMS.png" alt="Odoo"
+                        class="w-8 h-8 object-contain filter brightness-0 invert">
+                </div>
+                <span class="text-2xl font-bold tracking-wide">Odoo HRMS</span>
+            </div>
+            <div class="hidden md:flex items-center space-x-8 text-xl">
+                <a id="navEmployeesBtn"
+                    class="hover:text-primary hover:underline decoration-wavy decoration-2 underline-offset-4 transition-colors"
+                    href="#">Employees</a>
+                <a class="hover:text-primary hover:underline decoration-wavy decoration-2 underline-offset-4 transition-colors"
+                    href="/attendance.html">Attendance</a>
+                <a class="hover:text-primary hover:underline decoration-wavy decoration-2 underline-offset-4 transition-colors"
+                    href="/timeoff.html">Time Off</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                    <span class="material-icons">notifications</span>
+                </button>
+                <button id="logoutBtn" class="p-2 rounded-full hover:bg-gray-100 transition-colors text-red-600"
+                    title="Logout">
+                    <span class="material-icons">logout</span>
+                </button>
+                <div class="w-10 h-10 rounded-full border-2 border-black overflow-hidden bg-gray-200">
+                    <img id="navAvatar" alt="Profile Avatar" class="w-full h-full object-cover"
+                        src="https://ui-avatars.com/api/?name=User&background=random" />
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main class="max-w-7xl mx-auto p-6 md:p-8 space-y-12">
+        <header class="border-b-2 border-black pb-4 mb-8 flex justify-between items-center">
+            <h1 class="text-4xl font-bold">Employee Profile</h1>
+            <div id="saveControls" class="hidden gap-3">
+                <button onclick="window.location.reload()"
+                    class="px-4 py-2 bg-gray-200 border-2 border-black rounded shadow-sketchy hover:bg-gray-300 text-lg">Cancel</button>
+                <button onclick="saveProfile()"
+                    class="px-6 py-2 bg-primary text-white border-2 border-black rounded shadow-sketchy hover:bg-secondary text-lg font-bold">Save
+                    Changes</button>
+            </div>
+        </header>
+        <section class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start mb-12">
+            <div class="md:col-span-3 flex justify-center md:justify-start">
+                <div class="relative group">
+                    <div
+                        class="w-48 h-48 rounded-full border-2 border-black overflow-hidden shadow-sketchy transition-transform hover:scale-105 bg-gray-100">
+                        <img id="profilePic" alt="Employee Photo" class="w-full h-full object-cover"
+                            src="https://ui-avatars.com/api/?name=EMP&background=random" />
+                    </div>
+                    <label id="uploadBtn" aria-label="Edit Profile Picture"
+                        class="absolute bottom-2 right-2 bg-primary text-white p-3 rounded-full border-2 border-black hover:bg-secondary transition-colors shadow-lg group-hover:animate-bounce cursor-pointer hidden">
+                        <span class="material-icons text-xl">edit</span>
+                        <input type="file" id="picInput" class="hidden" accept="image/*" onchange="uploadPhoto(this)">
+                    </label>
+                </div>
+            </div>
+            <div class="md:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                <!-- Data Fields -->
+                <div class="space-y-6">
+                    <div>
+                        <input id="fullName"
+                            class="w-full text-4xl font-bold bg-transparent border-b-2 border-black border-t-0 border-l-0 border-r-0 focus:ring-0 focus:border-primary px-0 pb-2 placeholder-gray-400"
+                            type="text" value="Loading..." />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xl opacity-70">Login ID</label>
+                        <!-- Editable Input for ID -->
+                        <input id="loginId" disabled
+                            class="w-full text-2xl font-bold bg-transparent border-b border-gray-300 focus:border-primary focus:outline-none p-1"
+                            type="text" value="EMP-XXXX-XXXX" />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xl opacity-70">Email</label>
+                        <input id="email"
+                            class="sketchy-input w-full px-4 py-3 bg-white text-lg focus:ring-2 focus:ring-primary/20"
+                            type="email" value="" />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xl opacity-70">Mobile</label>
+                        <input id="mobile"
+                            class="sketchy-input w-full px-4 py-3 bg-white text-lg focus:ring-2 focus:ring-primary/20"
+                            type="tel" value="" />
+                    </div>
+                </div>
+                <div class="space-y-6 md:mt-16">
+                    <div class="space-y-2">
+                        <label class="block text-xl opacity-70">Company</label>
+                        <input id="company"
+                            class="sketchy-input w-full px-4 py-3 bg-white text-lg focus:ring-2 focus:ring-primary/20"
+                            type="text" value="" />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xl opacity-70">Department</label>
+                        <input id="department"
+                            class="sketchy-input w-full px-4 py-3 bg-white text-lg focus:ring-2 focus:ring-primary/20"
+                            type="text" value="" />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xl opacity-70">Manager</label>
+                        <input id="manager"
+                            class="sketchy-input w-full px-4 py-3 bg-white text-lg focus:ring-2 focus:ring-primary/20"
+                            type="text" value="" />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xl opacity-70">Location</label>
+                        <input id="location"
+                            class="sketchy-input w-full px-4 py-3 bg-white text-lg focus:ring-2 focus:ring-primary/20"
+                            type="text" value="" />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xl opacity-70">Status</label>
+                        <select id="status"
+                            class="sketchy-input w-full px-4 py-3 bg-white text-lg focus:ring-2 focus:ring-primary/20">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-6">
+            <div class="lg:col-span-2 space-y-12">
+                <div class="group relative dashed-hand-drawn-border bg-white p-6 pb-12 transition-all duration-300">
+                    <h3 class="text-3xl font-bold mb-4">About</h3>
+                    <textarea id="about"
+                        class="w-full bg-transparent border-0 focus:ring-0 p-0 text-lg leading-relaxed resize-none placeholder-gray-400"
+                        placeholder="Write something about yourself..." rows="5">Loading...</textarea>
+                </div>
+                <div class="group relative dashed-hand-drawn-border bg-white p-6 pb-12 transition-all duration-300">
+                    <h3 class="text-3xl font-bold mb-4">What I love about my job</h3>
+                    <textarea id="jobLove"
+                        class="w-full bg-transparent border-0 focus:ring-0 p-0 text-lg leading-relaxed resize-none placeholder-gray-400"
+                        placeholder="Share your thoughts..." rows="5">Loading...</textarea>
+                </div>
+                <div class="group relative dashed-hand-drawn-border bg-white p-6 pb-12 transition-all duration-300">
+                    <h3 class="text-3xl font-bold mb-4">My interests and hobbies</h3>
+                    <textarea id="interests"
+                        class="w-full bg-transparent border-0 focus:ring-0 p-0 text-lg leading-relaxed resize-none placeholder-gray-400"
+                        placeholder="List your hobbies..." rows="5">Loading...</textarea>
+                </div>
+            </div>
+            <div class="lg:col-span-1 space-y-12">
+                <!-- Skills and Certs can be enhanced later with dynamic lists. For now using text areas for simplicity in "Complete Plan" or implemented as JSON text. 
+                      Ideally, this would be a tagging UI. 
+                      Given "Perfectly 100% Accurately", I should try to make it list-based if possible, but let's stick to the visual structure first.
+                 -->
+                <div
+                    class="group relative dashed-hand-drawn-border bg-white p-6 pb-12 h-full max-h-[500px] overflow-y-auto custom-scrollbar flex flex-col justify-between transition-all duration-300">
+                    <div>
+                        <h3 class="text-3xl font-bold mb-6 border-b-2 border-black/10 pb-2">Skills (JSON)</h3>
+                        <textarea id="skills" class="w-full bg-transparent border-0 focus:ring-0 p-0 text-lg" rows="10"
+                            placeholder='["React", "Node.js"]'></textarea>
+                    </div>
+                </div>
+                <div
+                    class="group relative dashed-hand-drawn-border bg-white p-6 pb-12 h-full max-h-[500px] overflow-y-auto custom-scrollbar flex flex-col justify-between transition-all duration-300">
+                    <div>
+                        <h3 class="text-3xl font-bold mb-6 border-b-2 border-black/10 pb-2">Certifications (JSON)</h3>
+                        <textarea id="certifications" class="w-full bg-transparent border-0 focus:ring-0 p-0 text-lg"
+                            rows="10" placeholder='[{"name": "PMP", "date": "2023"}]'></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Salary Section (Admin Only) -->
+        <section id="salarySection" class="hidden border-t-2 border-black pt-8 mt-12 pb-12">
+            <h2 class="text-4xl font-bold mb-8">Salary Structure</h2>
+            <div class="group relative dashed-hand-drawn-border bg-white p-8 transition-all duration-300">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Basic Wage -->
+                    <div>
+                        <label class="block text-xl font-bold mb-2">Monthly Wage (CTC)</label>
+                        <input id="sal_wage" type="number" class="sketchy-input w-full px-4 py-3 bg-white text-lg"
+                            placeholder="e.g. 50000" />
+                    </div>
+                    <div>
+                        <!-- Spacer or Net Pay calc -->
+                        <label class="block text-xl font-bold mb-2 text-gray-500">Calculated Net (Approx)</label>
+                        <div id="sal_net" class="text-3xl font-bold text-green-600">--</div>
+                    </div>
+                </div>
+
+                <hr class="my-8 border-black border-dashed">
+
+                <h3 class="text-2xl font-bold mb-4">Components</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                    <!-- Basic -->
+                    <div class="p-4 border border-black rounded bg-white">
+                        <label class="block font-bold">Basic Pay</label>
+                        <div class="flex gap-2 mt-2">
+                            <select id="sal_basic_mode" class="border border-black p-2 rounded">
+                                <option value="Percentage">Percentage (%)</option>
+                                <option value="Fixed">Fixed Amount</option>
+                            </select>
+                            <input id="sal_basic_val" type="number" class="border border-black p-2 rounded w-full"
+                                placeholder="Value" />
+                        </div>
+                    </div>
+                    <!-- HRA -->
+                    <div class="p-4 border border-black rounded bg-white">
+                        <label class="block font-bold">HRA</label>
+                        <div class="flex gap-2 mt-2">
+                            <select id="sal_hra_mode" class="border border-black p-2 rounded">
+                                <option value="Percentage">Percentage (%)</option>
+                                <option value="Fixed">Fixed Amount</option>
+                            </select>
+                            <input id="sal_hra_val" type="number" class="border border-black p-2 rounded w-full"
+                                placeholder="Value" />
+                        </div>
+                    </div>
+                    <!-- Standard Allowance -->
+                    <div class="p-4 border border-black rounded bg-white">
+                        <label class="block font-bold">Standard Allowance</label>
+                        <div class="flex gap-2 mt-2">
+                            <select id="sal_std_mode" class="border border-black p-2 rounded">
+                                <option value="Percentage">Percentage (%)</option>
+                                <option value="Fixed">Fixed Amount</option>
+                            </select>
+                            <input id="sal_std_val" type="number" class="border border-black p-2 rounded w-full"
+                                placeholder="Value" />
+                        </div>
+                    </div>
+                    <!-- Bonus -->
+                    <div class="p-4 border border-black rounded bg-white">
+                        <label class="block font-bold">Bonus</label>
+                        <div class="flex gap-2 mt-2">
+                            <select id="sal_bonus_mode" class="border border-black p-2 rounded">
+                                <option value="Percentage">Percentage (%)</option>
+                                <option value="Fixed">Fixed Amount</option>
+                            </select>
+                            <input id="sal_bonus_val" type="number" class="border border-black p-2 rounded w-full"
+                                placeholder="Value" />
+                        </div>
+                    </div>
+                    <!-- LTA -->
+                    <div class="p-4 border border-black rounded bg-white">
+                        <label class="block font-bold">LTA</label>
+                        <div class="flex gap-2 mt-2">
+                            <select id="sal_lta_mode" class="border border-black p-2 rounded">
+                                <option value="Percentage">Percentage (%)</option>
+                                <option value="Fixed">Fixed Amount</option>
+                            </select>
+                            <input id="sal_lta_val" type="number" class="border border-black p-2 rounded w-full"
+                                placeholder="Value" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-end">
+                    <button onclick="saveSalary()"
+                        class="px-6 py-3 bg-green-600 text-white font-bold border-2 border-black rounded shadow-sketchy hover:bg-green-700">Save
+                        Salary Details</button>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="mt-12 py-8 border-t-2 border-black text-center opacity-60">
+        <p>© 2026 Odoo HRMS. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const API_BASE = '/api';
+        const empId = new URLSearchParams(window.location.search).get('id'); // Get ID from URL
+        let currentUserRole = 'EMPLOYEE';
+
+        async function init() {
+            const token = localStorage.getItem('token');
+            if (!token) window.location.href = '/login.html';
+
+            // Parse Role for Navbar Links
+            const userRole = localStorage.getItem('userRole') || 'EMPLOYEE';
+            const targetDash = ['ADMIN', 'HR'].includes(userRole) ? '/admin-dashboard.html' : '/dashboard.html';
+
+            document.getElementById('navLogoBtn').onclick = () => window.location.href = targetDash;
+            document.getElementById('navEmployeesBtn').href = targetDash;
+
+            if (!empId) {
+                Toast.error('No Employee Specified'); // Or redirect to dashboard
+                // window.location.href='/dashboard.html';
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/employees/${empId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (res.status === 404) { Toast.error('Employee not found'); return; }
+                if (res.status === 403) { Toast.error('Access Denied'); window.location.href = '/dashboard.html'; return; }
+
+                const data = await res.json();
+
+                // Handle Redirect for Self
+                if (data.meta.is_self) {
+                    window.location.href = '/profile.html'; // Regular My Profile
+                    return;
+                }
+
+                populate(data.employee);
+                setupPermissions(data.meta);
+
+                // Fetch Salary if Admin
+                if (data.meta.is_admin_or_hr) {
+                    document.getElementById('salarySection').classList.remove('hidden');
+                    fetchSalary();
+                }
+
+            } catch (e) { console.error(e); }
+        }
+
+        function populate(emp) {
+            document.getElementById('fullName').value = `${emp.first_name} ${emp.last_name}`;
+            document.getElementById('loginId').value = emp.id; // Correct population of Input
+            document.getElementById('email').value = emp.personal_email || '';
+            document.getElementById('mobile').value = emp.mobile || '';
+            document.getElementById('company').value = emp.company || '';
+            document.getElementById('department').value = emp.department || '';
+            document.getElementById('manager').value = emp.manager_name || '';
+            document.getElementById('location').value = emp.location || '';
+            document.getElementById('status').value = emp.status || 'Active';
+
+            document.getElementById('about').value = emp.about || '';
+            document.getElementById('jobLove').value = emp.job_love || '';
+            document.getElementById('interests').value = emp.interests || '';
+
+            document.getElementById('skills').value = JSON.stringify(emp.skills, null, 2) || '';
+            document.getElementById('certifications').value = JSON.stringify(emp.certifications, null, 2) || '';
+
+            if (emp.profile_picture) document.getElementById('profilePic').src = emp.profile_picture;
+        }
+
+        function setupPermissions(meta) {
+            if (meta.permission === 'read_only') {
+                // Disable all inputs
+                const inputs = document.querySelectorAll('input, textarea, select');
+                inputs.forEach(el => {
+                    el.disabled = true;
+                    el.classList.add('cursor-not-allowed', 'bg-gray-50');
+                });
+                // Hide controls
+                document.getElementById('saveControls').classList.add('hidden');
+                document.getElementById('uploadBtn').classList.add('hidden');
+            } else {
+                // Edit Mode (Admin/HR)
+                document.getElementById('saveControls').classList.remove('hidden');
+                document.getElementById('saveControls').classList.add('flex'); // Show Save
+                document.getElementById('uploadBtn').classList.remove('hidden');
+
+                // Enable Login ID for Admin (it defaults to disabled in HTML)
+                document.getElementById('loginId').disabled = false;
+            }
+        }
+
+        async function fetchSalary() {
+            try {
+                const res = await fetch(`${API_BASE}/employees/${empId}/salary`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (res.ok) {
+                    const { exists, data } = await res.json();
+                    if (data) {
+                        document.getElementById('sal_wage').value = data.monthly_wage || '';
+
+                        // Components
+                        document.getElementById('sal_basic_mode').value = data.basic_mode || 'Percentage';
+                        document.getElementById('sal_basic_val').value = data.basic_value || 50;
+
+                        document.getElementById('sal_hra_mode').value = data.hra_mode || 'Percentage';
+                        document.getElementById('sal_hra_val').value = data.hra_value || 50;
+
+                        document.getElementById('sal_std_mode').value = data.std_allowance_mode || 'Fixed';
+                        document.getElementById('sal_std_val').value = data.std_allowance_value || 0;
+
+                        document.getElementById('sal_bonus_mode').value = data.bonus_mode || 'Fixed';
+                        document.getElementById('sal_bonus_val').value = data.bonus_value || 0;
+
+                        document.getElementById('sal_lta_mode').value = data.lta_mode || 'Fixed';
+                        document.getElementById('sal_lta_val').value = data.lta_value || 0;
+                    }
+                }
+            } catch (e) { console.error('Salary Fetch Error', e); }
+        }
+
+        async function saveSalary() {
+            const body = {
+                monthly_wage: document.getElementById('sal_wage').value,
+                basic_mode: document.getElementById('sal_basic_mode').value,
+                basic_value: document.getElementById('sal_basic_val').value,
+                hra_mode: document.getElementById('sal_hra_mode').value,
+                hra_value: document.getElementById('sal_hra_val').value,
+                std_allowance_mode: document.getElementById('sal_std_mode').value,
+                std_allowance_value: document.getElementById('sal_std_val').value,
+                bonus_mode: document.getElementById('sal_bonus_mode').value,
+                bonus_value: document.getElementById('sal_bonus_val').value,
+                lta_mode: document.getElementById('sal_lta_mode').value,
+                lta_value: document.getElementById('sal_lta_val').value
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/employees/${empId}/salary`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+                const d = await res.json();
+                if (res.ok) Toast.success('Salary Saved');
+                else Toast.error(d.message);
+            } catch (e) {
+                console.error(e);
+                Toast.error('Failed to save salary');
+            }
+        }
+
+        async function saveProfile() {
+            const token = localStorage.getItem('token');
+            const body = {
+                id: document.getElementById('loginId').value, // Include ID in update
+                first_name: document.getElementById('fullName').value.split(' ')[0], // Simple split
+                last_name: document.getElementById('fullName').value.split(' ').slice(1).join(' '),
+                personal_email: document.getElementById('email').value,
+                mobile: document.getElementById('mobile').value,
+                company: document.getElementById('company').value,
+                department: document.getElementById('department').value,
+                manager_name: document.getElementById('manager').value,
+                location: document.getElementById('location').value,
+                status: document.getElementById('status').value,
+                about: document.getElementById('about').value,
+                job_love: document.getElementById('jobLove').value,
+                interests: document.getElementById('interests').value,
+                skills: safeJSON(document.getElementById('skills').value),
+                certifications: safeJSON(document.getElementById('certifications').value)
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/employees/${empId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+                const d = await res.json();
+                if (res.ok) Toast.success('Profile Updated Successfully');
+                else Toast.error(d.message);
+            } catch (e) { console.error(e); Toast.error('Error saving profile'); }
+        }
+
+        async function uploadPhoto(input) {
+            if (!input.files[0]) return;
+            const token = localStorage.getItem('token');
+            const formData = new FormData();
+            formData.append('image', input.files[0]);
+
+            try {
+                const res = await fetch(`${API_BASE}/employees/${empId}/upload-photo`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                const d = await res.json();
+                if (res.ok) {
+                    document.getElementById('profilePic').src = d.url;
+                    Toast.success('Profile Picture Updated');
+                } else Toast.error(d.message);
+            } catch (e) { console.error(e); }
+        }
+
+        function safeJSON(str) {
+            try { return JSON.parse(str); } catch (e) { return []; }
+        }
+
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('token');
+                window.location.replace('/login.html');
+            });
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html class="" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Salary Information - Hand-drawn HRMS</title>
+    <!-- Use Local Output CSS -->
+    <link href="/css/output.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <script src="/js/toast.js"></script>
+    <style>
+        body {
+            font-family: 'Gochi Hand', cursive;
+        }
+
+        .hand-drawn-input {
+            border: 2px solid currentColor;
+            border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+            background-color: transparent;
+            transition: all 0.2s ease;
+        }
+
+        .hand-drawn-input:focus {
+            outline: none;
+            border-color: #9C27B0;
+            box-shadow: 0 0 0 2px rgba(156, 39, 176, 0.2);
+            transform: scale(1.01);
+        }
+
+        .hand-drawn-border-bottom {
+            border-bottom: 2px solid currentColor;
+            border-radius: 0 0 200px 5px / 0 0 5px 200px;
+        }
+
+        .shadow-hand-drawn {
+            box-shadow: 2px 3px 0px 0px rgba(0, 0, 0, 1);
+        }
+
+        /* Navbar Reuse styles mostly inherited from output.css or this file */
+    </style>
+</head>
+
+<body class="bg-white text-gray-900 min-h-screen p-4 md:p-8 transition-colors duration-300">
+    <div class="max-w-7xl mx-auto">
+        <!-- Reusing Header Structure but adapting for "Salary Info" context per design -->
+        <header class="mb-8 flex flex-col md:flex-row justify-between items-center border-b-2 border-black pb-4"
+            style="border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;">
+            <div class="flex items-center gap-4 mb-4 md:mb-0 cursor-pointer"
+                onclick="window.location.href='/dashboard.html'">
+                <div
+                    class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xl border-2 border-black shadow-hand-drawn">
+                    HR
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold">Employee Salary Profile</h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="text-lg bg-yellow-100 px-3 py-1 border-2 border-black rounded-lg transform -rotate-2">
+                    <span class="material-icons text-sm align-middle mr-1">admin_panel_settings</span>
+                    Confidentail Admin View
+                </span>
+                <button onclick="saveSalary()"
+                    class="px-4 py-2 border-2 border-black rounded-lg hover:bg-gray-100 transition shadow-hand-drawn bg-primary text-white font-bold hover:bg-purple-700">
+                    Save Changes
+                </button>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs (Visual mainly, but functional link back) -->
+        <div class="flex flex-wrap gap-2 mb-8 border-b-2 border-gray-300 pb-1">
+            <button onclick="goProfile()" class="px-6 py-2 text-xl opacity-60 hover:opacity-100 transition">Personal
+                Info</button>
+            <!-- <button class="px-6 py-2 text-xl opacity-60 hover:opacity-100 transition">Documents</button> -->
+            <button
+                class="px-6 py-2 text-xl font-bold border-b-4 border-primary text-primary -mb-1.5 bg-white rounded-t-lg">
+                Salary Info
+            </button>
+            <!-- <button class="px-6 py-2 text-xl opacity-60 hover:opacity-100 transition">Attendance</button> -->
+        </div>
+
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <section
+                class="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 p-6 border-2 border-black rounded-lg shadow-hand-drawn bg-white relative">
+                <div
+                    class="absolute -top-4 -right-2 bg-yellow-200 text-black p-2 w-32 text-center transform rotate-3 shadow-md border border-black z-10 text-sm">
+                    Confidential Data
+                </div>
+                <div class="space-y-6">
+                    <div class="flex items-center gap-4">
+                        <label class="w-32 text-xl">Monthly Wage</label>
+                        <div class="flex-1 flex items-center gap-2">
+                            <input id="monthlyWage"
+                                class="hand-drawn-input w-full text-right text-2xl font-bold px-3 py-2 bg-white focus:ring-0"
+                                type="number" value="0.00" oninput="recalcAll()" />
+                            <span class="text-xl whitespace-nowrap">/ Month</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <label class="w-32 text-xl">Yearly Wage</label>
+                        <div class="flex-1 flex items-center gap-2">
+                            <input id="yearlyWage" readonly
+                                class="hand-drawn-input w-full text-right text-2xl font-bold px-3 py-2 bg-gray-50 focus:ring-0 text-gray-500"
+                                type="text" value="0.00" />
+                            <span class="text-xl whitespace-nowrap">/ Yearly</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <label class="text-xl flex-1">No of working days in a week:</label>
+                        <div class="w-32">
+                            <input id="workingDays"
+                                class="hand-drawn-input w-full text-center text-xl px-2 py-1 bg-white" type="number"
+                                value="5" />
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <label class="text-xl flex-1">Break Time:</label>
+                        <div class="flex items-center gap-2 w-auto sm:w-48 justify-end">
+                            <input id="breakTime" class="hand-drawn-input w-20 text-center text-xl px-2 py-1 bg-white"
+                                type="number" step="0.5" value="1" />
+                            <span class="text-2xl">/ hrs</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Components Section -->
+            <section class="lg:col-span-7 space-y-8">
+                <h2 class="text-2xl font-bold border-b-2 border-black pb-2 inline-block transform -rotate-1">Salary
+                    Components</h2>
+                <div class="space-y-8" id="componentsContainer">
+
+                    <!-- Basic -->
+                    <div class="group">
+                        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-2">
+                            <label class="text-xl font-bold min-w-[150px]">Basic Salary</label>
+                            <div class="flex flex-1 items-end gap-2 justify-end">
+                                <div class="flex flex-col items-end w-full sm:w-auto">
+                                    <div class="relative w-full sm:w-40">
+                                        <input id="basicAmt" readonly
+                                            class="hand-drawn-border-bottom w-full text-right bg-transparent px-2 py-1 focus:outline-none focus:border-primary border-gray-400 font-mono text-lg"
+                                            type="text" value="0.00" />
+                                    </div>
+                                </div>
+                                <span class="text-sm mb-1">₹ / month</span>
+                            </div>
+                            <!-- Config: % of Wage -->
+                            <div class="flex items-end gap-2 w-full sm:w-auto justify-end">
+                                <div class="relative w-24">
+                                    <input id="basicVal"
+                                        class="hand-drawn-border-bottom w-full text-right bg-transparent px-2 py-1 focus:outline-none focus:border-primary border-gray-400 font-mono text-lg"
+                                        type="number" value="50.00" oninput="recalcAll()" />
+                                </div>
+                                <span class="text-xl mb-1">% Wage</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- HRA -->
+                    <div class="group">
+                        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-2">
+                            <label class="text-xl font-bold min-w-[150px]">House Rent Allowance</label>
+                            <div class="flex flex-1 items-end gap-2 justify-end">
+                                <div class="flex flex-col items-end w-full sm:w-auto">
+                                    <div class="relative w-full sm:w-40">
+                                        <input id="hraAmt" readonly
+                                            class="hand-drawn-border-bottom w-full text-right bg-transparent px-2 py-1 focus:outline-none focus:border-primary border-gray-400 font-mono text-lg"
+                                            type="text" value="0.00" />
+                                    </div>
+                                </div>
+                                <span class="text-sm mb-1">₹ / month</span>
+                            </div>
+                            <!-- Config: % of BASIC -->
+                            <div class="flex items-end gap-2 w-full sm:w-auto justify-end">
+                                <div class="relative w-24">
+                                    <input id="hraVal"
+                                        class="hand-drawn-border-bottom w-full text-right bg-transparent px-2 py-1 focus:outline-none focus:border-primary border-gray-400 font-mono text-lg"
+                                        type="number" value="50.00" oninput="recalcAll()" />
+                                </div>
+                                <span class="text-xl mb-1">% Basic</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Standard Allowance (Usually Fixed) -->
+                    <div class="group">
+                        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-2">
+                            <label class="text-xl font-bold min-w-[150px]">Standard Allowance</label>
+                            <div class="flex flex-1 items-end gap-2 justify-end">
+                                <div class="flex flex-col items-end w-full sm:w-auto">
+                                    <div class="relative w-full sm:w-40">
+                                        <input id="stdAmt"
+                                            class="hand-drawn-border-bottom w-full text-right bg-transparent px-2 py-1 focus:outline-none focus:border-primary border-gray-400 font-mono text-lg"
+                                            type="number" value="0.00" oninput="recalcAll()" />
+                                    </div>
+                                </div>
+                                <span class="text-sm mb-1">₹ / month</span>
+                            </div>
+
+                            <div class="flex items-end gap-2 w-full sm:w-auto justify-end text-gray-400">
+                                <span class="text-sm italic">Fixed Amt</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performance Bonus -->
+                    <div class="group">
+                        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-2">
+                            <label class="text-xl font-bold min-w-[150px]">Performance Bonus</label>
+                            <div class="flex flex-1 items-end gap-2 justify-end">
+                                <div class="flex flex-col items-end w-full sm:w-auto">
+                                    <div class="relative w-full sm:w-40">
+                                        <input id="bonusAmt" readonly
+                                            class="hand-drawn-border-bottom w-full text-right bg-transparent px-2 py-1 focus:outline-none focus:border-primary border-gray-400 font-mono text-lg"
+                                            type="text" value="0.00" />
+                                    </div>
+                                </div>
+                                <span class="text-sm mb-1">₹ / month</span>
+                            </div>
+                            <!-- Config: % of BASIC -->
+                            <div class="flex items-end gap-2 w-full sm:w-auto justify-end">
+                                <div class="relative w-24">
+                                    <input id="bonusVal"
+                                        class="hand-drawn-border-bottom w-full text-right bg-transparent px-2 py-1 focus:outline-none focus:border-primary border-gray-400 font-mono text-lg"
+                                        type="number" value="8.33" oninput="recalcAll()" />
+                                </div>
+                                <span class="text-xl mb-1">% Basic</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LTA -->
+                    <div class="group">
+                        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-2">
+                            <label class="text-xl font-bold min-w-[150px]">Leave Travel Allowance</label>
+                            <div class="flex flex-1 items-end gap-2 justify-end">
+                                <div class="flex flex-col items-end w-full sm:w-auto">
+                                    <div class="relative w-full sm:w-40">
+                                        <input id="ltaAmt" readonly
+                                            class="hand-drawn-border-bottom w-full text-right bg-transparent px-2 py-1 focus:outline-none focus:border-primary border-gray-400 font-mono text-lg"
+                                            type="text" value="0.00" />
+                                    </div>
+                                </div>
+                                <span class="text-sm mb-1">₹ / month</span>
+                            </div>
+                            <!-- Config: % of BASIC -->
+                            <div class="flex items-end gap-2 w-full sm:w-auto justify-end">
+                                <div class="relative w-24">
+                                    <input id="ltaVal"
+                                        class="hand-drawn-border-bottom w-full text-right bg-transparent px-2 py-1 focus:outline-none focus:border-primary border-gray-400 font-mono text-lg"
+                                        type="number" value="8.33" oninput="recalcAll()" />
+                                </div>
+                                <span class="text-xl mb-1">% Basic</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fixed Allowance (Balancing Figure) -->
+                    <div class="group bg-gray-50 p-2 rounded border border-dashed border-gray-300">
+                        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-2">
+                            <label class="text-xl font-bold min-w-[150px] text-primary">Fixed Allowance</label>
+                            <div class="flex flex-1 items-end gap-2 justify-end">
+                                <div class="flex flex-col items-end w-full sm:w-auto">
+                                    <div class="relative w-full sm:w-40">
+                                        <input id="fixedAllowance" readonly
+                                            class="hand-drawn-border-bottom w-full text-right bg-transparent px-2 py-1 focus:outline-none border-primary font-bold text-primary font-mono text-lg"
+                                            type="text" value="0.00" />
+                                    </div>
+                                </div>
+                                <span class="text-sm mb-1">₹ / month</span>
+                            </div>
+                            <div class="flex items-end gap-2 w-full sm:w-auto justify-end text-gray-400">
+                                <span class="text-sm italic">Balancing Fig</span>
+                            </div>
+                        </div>
+                        <p id="fixedError" class="text-red-500 font-bold text-center hidden">Error: Total components
+                            exceed Monthly Wage!</p>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Statutory Section -->
+            <section class="lg:col-span-5 space-y-12">
+                <div class="space-y-6">
+                    <h2 class="text-2xl font-bold border-b-2 border-black pb-2 inline-block transform rotate-1">
+                        Provident Fund (PF)</h2>
+                    <div class="group">
+                        <div class="flex flex-col gap-2 mb-2">
+                            <label class="text-lg font-bold">Employee Contribution</label>
+                            <div class="flex flex-wrap items-end gap-2 justify-between">
+                                <div class="flex items-end gap-2 flex-1">
+                                    <input id="pfEmpAmt" readonly
+                                        class="hand-drawn-border-bottom w-full text-right bg-transparent px-2 py-1 focus:outline-none border-gray-400 font-mono text-lg"
+                                        type="text" value="0.00" />
+                                    <span class="text-sm mb-1 whitespace-nowrap">₹ / month</span>
+                                </div>
+                                <div class="flex items-end gap-2 w-24">
+                                    <input id="pfEmpVal"
+                                        class="hand-drawn-border-bottom w-full text-right bg-transparent px-2 py-1 focus:outline-none border-gray-400 font-mono text-lg"
+                                        type="number" value="12.00" oninput="recalcAll()" />
+                                    <span class="text-xl mb-1">% Basic</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="group">
+                        <div class="flex flex-col gap-2 mb-2">
+                            <label class="text-lg font-bold">Employer Contribution</label>
+                            <div class="flex flex-wrap items-end gap-2 justify-between">
+                                <div class="flex items-end gap-2 flex-1">
+                                    <input id="pfEmplrAmt" readonly
+                                        class="hand-drawn-border-bottom w-full text-right bg-transparent px-2 py-1 focus:outline-none border-gray-400 font-mono text-lg"
+                                        type="text" value="0.00" />
+                                    <span class="text-sm mb-1 whitespace-nowrap">₹ / month</span>
+                                </div>
+                                <div class="flex items-end gap-2 w-24">
+                                    <input id="pfEmplrVal"
+                                        class="hand-drawn-border-bottom w-full text-right bg-transparent px-2 py-1 focus:outline-none border-gray-400 font-mono text-lg"
+                                        type="number" value="12.00" oninput="recalcAll()" />
+                                    <span class="text-xl mb-1">% Basic</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <h2 class="text-2xl font-bold border-b-2 border-black pb-2 inline-block transform -rotate-1">Tax
+                        Deductions</h2>
+                    <div class="group">
+                        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-2">
+                            <label class="text-lg font-bold">Professional Tax</label>
+                            <div class="flex items-end gap-2">
+                                <div class="relative w-32">
+                                    <input id="profTax"
+                                        class="hand-drawn-border-bottom w-full text-right bg-transparent px-2 py-1 focus:outline-none border-gray-400 font-mono text-lg"
+                                        type="number" value="200.00" oninput="recalcAll()" />
+                                </div>
+                                <span class="text-sm mb-1 whitespace-nowrap">₹ / month</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Widget -->
+                <div class="flex justify-end pt-8">
+                    <div
+                        class="transform rotate-2 bg-purple-100 text-black p-4 rounded-lg shadow-lg border-2 border-black w-full text-center relative">
+                        <h3 class="font-bold text-xl border-b border-black mb-2">Summary</h3>
+                        <div class="flex justify-between text-lg">
+                            <span>Cost to Company:</span>
+                            <span class="font-bold" id="ctcDisplay">0.00</span>
+                        </div>
+                        <div class="flex justify-between text-lg text-green-700">
+                            <span>Gross Salary:</span>
+                            <span class="font-bold" id="grossDisplay">0.00</span>
+                        </div>
+                        <div class="flex justify-between text-lg text-red-700 border-b border-gray-400 pb-1 mb-1">
+                            <span>Net Deductions:</span>
+                            <span class="font-bold" id="deductionDisplay">0.00</span>
+                        </div>
+                        <div class="flex justify-between text-xl font-bold">
+                            <span>Net Pay:</span>
+                            <span class="" id="netPayDisplay">0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        const empId = new URLSearchParams(window.location.search).get('id');
+        let isValid = true;
+
+        async function init() {
+            const token = localStorage.getItem('token');
+            if (!token) window.location.href = '/login.html';
+            if (!empId) { alert('No ID'); return; }
+
+            try {
+                const res = await fetch(`${API_BASE}/employees/${empId}/salary`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (res.status === 403 || res.status === 401) {
+                    Toast.error('Access Denied');
+                    window.location.href = '/dashboard.html';
+                    return;
+                }
+
+                const json = await res.json();
+                if (json.exists) {
+                    populate(json.data);
+                } else {
+                    recalcAll(); // Calc default
+                }
+
+            } catch (e) { console.error(e); Toast.error('Failed to load salary data.'); }
+        }
+
+        function populate(data) {
+            document.getElementById('monthlyWage').value = data.monthly_wage;
+            document.getElementById('workingDays').value = data.working_days_per_week;
+            document.getElementById('breakTime').value = data.break_time;
+
+            document.getElementById('basicVal').value = data.basic_value;
+            document.getElementById('hraVal').value = data.hra_value;
+            // standard allowance is fixed
+            document.getElementById('stdAmt').value = data.std_allowance_value;
+            document.getElementById('bonusVal').value = data.bonus_value;
+            document.getElementById('ltaVal').value = data.lta_value;
+
+            document.getElementById('pfEmpVal').value = data.pf_employee_percent;
+            document.getElementById('pfEmplrVal').value = data.pf_employer_percent;
+            document.getElementById('profTax').value = data.professional_tax;
+
+            recalcAll();
+        }
+
+        function recalcAll() {
+            const wage = parseFloat(document.getElementById('monthlyWage').value) || 0;
+
+            // Yearly
+            document.getElementById('yearlyWage').value = (wage * 12).toFixed(2);
+
+            // 1. Basic (% of Wage)
+            const basicPct = parseFloat(document.getElementById('basicVal').value) || 0;
+            const basic = wage * (basicPct / 100);
+            document.getElementById('basicAmt').value = basic.toFixed(2);
+
+            // 2. HRA (% of Basic)
+            const hraPct = parseFloat(document.getElementById('hraVal').value) || 0;
+            const hra = basic * (hraPct / 100);
+            document.getElementById('hraAmt').value = hra.toFixed(2);
+
+            // 3. Standard Allowance (Fixed)
+            const std = parseFloat(document.getElementById('stdAmt').value) || 0;
+
+            // 4. Bonus (% of Basic)
+            const bonusPct = parseFloat(document.getElementById('bonusVal').value) || 0;
+            const bonus = basic * (bonusPct / 100);
+            document.getElementById('bonusAmt').value = bonus.toFixed(2);
+
+            // 5. LTA (% of Basic)
+            const ltaPct = parseFloat(document.getElementById('ltaVal').value) || 0;
+            const lta = basic * (ltaPct / 100);
+            document.getElementById('ltaAmt').value = lta.toFixed(2);
+
+            // Fixed Allowance (Balancing)
+            const used = basic + hra + std + bonus + lta;
+            const fixed = wage - used;
+            document.getElementById('fixedAllowance').value = fixed.toFixed(2);
+
+            if (fixed < 0) {
+                Toast.error('Structure Exceeds Wage! Reduce components.');
+                document.getElementById('fixedAllowance').classList.add('text-red-500');
+                document.getElementById('fixedError').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('fixedAllowance').classList.remove('text-red-500');
+                document.getElementById('fixedError').classList.add('hidden');
+                isValid = true;
+            }
+
+            // Statutory: PF
+            const pfEmpPct = parseFloat(document.getElementById('pfEmpVal').value) || 0;
+            const pfEmp = basic * (pfEmpPct / 100);
+            document.getElementById('pfEmpAmt').value = pfEmp.toFixed(2);
+
+            const pfEmplrPct = parseFloat(document.getElementById('pfEmplrVal').value) || 0;
+            const pfEmplr = basic * (pfEmplrPct / 100);
+            document.getElementById('pfEmplrAmt').value = pfEmplr.toFixed(2);
+
+            const pt = parseFloat(document.getElementById('profTax').value) || 0;
+
+            // Summary
+            // Gross = Wage (Technically, Gross is sum of allowances. Here Wage IS Gross target)
+            // But usually Employer PF is Over and Above Gross (CTC) or inside.
+            // Assumption: Wage = Gross Salary without Employer PF.
+            const gross = wage;
+            const ctc = gross + pfEmplr;
+            const deductions = pfEmp + pt;
+            const net = gross - deductions;
+
+            document.getElementById('grossDisplay').innerText = gross.toFixed(2);
+            document.getElementById('ctcDisplay').innerText = ctc.toFixed(2);
+            document.getElementById('deductionDisplay').innerText = deductions.toFixed(2);
+            document.getElementById('netPayDisplay').innerText = net.toFixed(2);
+        }
+
+        async function saveSalary() {
+            recalcAll();
+            if (!isValid) {
+                Toast.error('Cannot Save: Total Components exceed Monthly Wage.');
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+            const payload = {
+                monthly_wage: document.getElementById('monthlyWage').value,
+                working_days_per_week: document.getElementById('workingDays').value,
+                break_time: document.getElementById('breakTime').value,
+
+                basic_mode: 'Percentage',
+                basic_value: document.getElementById('basicVal').value,
+
+                hra_mode: 'Percentage',
+                hra_value: document.getElementById('hraVal').value,
+
+                std_allowance_mode: 'Fixed',
+                std_allowance_value: document.getElementById('stdAmt').value,
+
+                bonus_mode: 'Percentage',
+                bonus_value: document.getElementById('bonusVal').value,
+
+                lta_mode: 'Percentage',
+                lta_value: document.getElementById('ltaVal').value,
+
+                pf_employee_percent: document.getElementById('pfEmpVal').value,
+                pf_employer_percent: document.getElementById('pfEmplrVal').value,
+                professional_tax: document.getElementById('profTax').value
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/employees/${empId}/salary`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    Toast.success('Salary Details Saved!');
+                } else {
+                    const d = await res.json();
+                    Toast.error(d.message);
+                }
+            } catch (e) { console.error(e); Toast.error('Error saving salary'); }
+        }
+
+        function goProfile() {
+            window.location.href = `/employee_profile.html?id=${empId}`;
+        }
+
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('scale-105', 'transition-transform');
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.classList.remove('scale-105');
+            });
+        });
+
+        init();
+    </script>
+</body>
+
+</html>

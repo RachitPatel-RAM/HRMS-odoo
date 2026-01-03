@@ -4,6 +4,7 @@ const { verifyPassword, hashPassword, generateTempPassword } = require('../utils
 const jwt = require('jsonwebtoken');
 const { sendVerificationEmail, sendPurpleTempPasswordEmail } = require('../utils/emailService');
 const sequelize = require('../config/db');
+const { Op } = require('sequelize');
 const UserService = require('./userService');
 
 class AuthService {
@@ -22,22 +23,15 @@ class AuthService {
                 )
             });
         } else {
-            // Assume Employee ID
-            // Find User via Employee relation
-            // We need to join? Or find Employee first. 
-            // User has employee_id. Employee has id.
-            // Wait, User model belongsTo Employee. 
-            // So we can find User where included Employee.id = identifier?
-            // Or just User.findOne({ where: { employee_id: identifier } })?
-            // Let's check User model. 
-            // User.init({ employee_id: { references: 'employees' ... }})
-            // BUT `employee_id` in User table might be the UUID of employee or the string ID?
-            // Employee model: `id: { type: DataTypes.STRING, primaryKey: true }`
-            // So yes, `employee_id` in User table IS the String ID "OI..."
-            // So we can search User directly by `employee_id`.
 
+            // Assume Employee ID or Login ID
             user = await User.findOne({
-                where: { employee_id: identifier }
+                where: {
+                    [Op.or]: [
+                        { employee_id: identifier },
+                        { login_id: identifier }
+                    ]
+                }
             });
         }
 

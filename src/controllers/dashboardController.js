@@ -4,6 +4,22 @@ const Attendance = require('../models/Attendance');
 const Leave = require('../models/Leave');
 const { Op } = require('sequelize');
 
+exports.getAdminStats = async (req, res) => {
+    try {
+        if (req.user.role !== 'ADMIN') return res.status(403).json({ message: 'Access Denied' });
+
+        const totalEmployees = await Employee.count({ where: { status: 'Active' } });
+        const totalHR = await User.count({ where: { role: 'HR' } });
+        const totalUsers = await User.count();
+
+        res.json({
+            employees: totalEmployees,
+            hrs: totalHR,
+            total_users: totalUsers
+        });
+    } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
 exports.getDashboardData = async (req, res) => {
     try {
         const userId = req.user.id; // From JWT
@@ -12,6 +28,7 @@ exports.getDashboardData = async (req, res) => {
         });
 
         if (!user || !user.Employee) {
+            console.log('Dashboard 404 Debug:', { userFound: !!user, hasEmployee: user ? !!user.Employee : false, userId });
             return res.status(404).json({ message: 'User/Employee profile not found' });
         }
 
@@ -85,8 +102,6 @@ exports.getDashboardData = async (req, res) => {
             };
         });
 
-        // ... (intermediate code for uniqueness and sorting) ...
-
         const myAttendance = latestAttendanceMap.get(myEmployeeId);
 
         const meData = {
@@ -94,9 +109,9 @@ exports.getDashboardData = async (req, res) => {
             name: `${user.Employee.first_name} ${user.Employee.last_name}`,
             email: user.email,
             designation: user.Employee.designation,
-            profile_picture: user.Employee.profile_picture
+            profile_picture: user.Employee.profile_picture,
+            role: user.role // Added role for frontend checks
         };
-        console.log('Sending Me Data:', meData); // DEBUG
 
         res.json({
             me: meData,

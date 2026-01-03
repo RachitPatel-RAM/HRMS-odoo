@@ -16,6 +16,12 @@ const User = sequelize.define('User', {
             isEmail: true
         }
     },
+    login_id: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true
+    },
+
     password_hash: {
         type: DataTypes.STRING,
         allowNull: false
@@ -33,13 +39,25 @@ const User = sequelize.define('User', {
         type: DataTypes.BOOLEAN,
         defaultValue: true
     },
+    force_password_change: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
     employee_id: {
         type: DataTypes.STRING,
         references: {
             model: Employee,
             key: 'id'
         },
-        allowNull: true // Admin might not be an employee? Or yes. Let's say all users are employees, but maybe Super Admin is special. I'll make it nullable for safety.
+        allowNull: true
+    },
+    otp: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    otp_expires: {
+        type: DataTypes.DATE,
+        allowNull: true
     }
 }, {
     timestamps: true,

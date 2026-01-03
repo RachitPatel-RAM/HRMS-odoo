@@ -14,7 +14,7 @@ const Attendance = sequelize.define('Attendance', {
     },
     check_in_time: {
         type: DataTypes.DATE,
-        allowNull: false
+        allowNull: true // Changed to true to allow leave records without check-in
     },
     check_out_time: {
         type: DataTypes.DATE,
@@ -43,6 +43,11 @@ const Attendance = sequelize.define('Attendance', {
     notes: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    extra_allocations: {
+        type: DataTypes.JSON, // Stores array of { start: ISOString, end: ISOString }
+        defaultValue: [],
+        allowNull: false
     }
 }, {
     tableName: 'attendance',

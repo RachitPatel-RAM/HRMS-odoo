@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Time Off Requests - HRMS</title>
+    <link href="/css/output.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&amp;display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="/js/toast.js"></script>
+
+    <style>
+        @font-face {
+            font-family: 'Gochi Hand';
+            src: url('/fonts/gochi.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'Gochi Hand', cursive;
+        }
+
+        .sketch-border {
+            border: 2px solid currentColor;
+            border-radius: 2px 5px 3px 6px;
+        }
+
+        .sketch-shadow {
+            box-shadow: 2px 3px 0px 0px rgba(0, 0, 0, 1);
+        }
+    </style>
+</head>
+
+<body class="bg-white text-gray-900 font-body min-h-screen flex flex-col transition-colors duration-200">
+
+    <!-- Header / Navbar -->
+    <header
+        class="sticky top-0 z-50 bg-white border-b-2 border-black px-6 py-2 flex justify-between items-center shadow-md relative">
+        <!-- Left: Logo -->
+        <div class="flex items-center gap-3">
+            <div class="flex items-center justify-center p-1">
+                <img src="/assets/logg_odooHRMS.png" alt="Odoo Logo" class="h-20 w-20 object-contain">
+            </div>
+        </div>
+
+        <!-- Center: Navigation -->
+        <nav class="hidden md:flex items-center gap-6 absolute left-1/2 transform -translate-x-1/2">
+            <a href="/admin-dashboard.html"
+                class="bg-white text-black px-6 py-2 text-xl font-bold border-2 border-black transform -rotate-1 shadow-[2px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all rounded-sm font-hand">
+                Employees
+            </a>
+            <a href="/admin_attendance.html"
+                class="bg-white text-black px-6 py-2 text-xl font-bold border-2 border-black transform rotate-1 shadow-[2px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:bg-gray-50 transition-all rounded-sm font-hand">
+                Attendance
+            </a>
+            <!-- Active Tab: Time Off -->
+            <a href="/admin_timeoff.html"
+                class="bg-primary text-white px-6 py-2 text-xl font-bold border-2 border-black transform -rotate-1 shadow-[2px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:bg-purple-700 transition-all rounded-sm font-hand">
+                Time Off
+            </a>
+            <a href="/admin_hr_management.html" id="nav-hr-management"
+                class="bg-white text-black px-6 py-2 text-xl font-bold border-2 border-black transform rotate-1 shadow-[2px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:bg-gray-50 transition-all rounded-sm font-hand">
+                HR Management
+            </a>
+        </nav>
+
+        <!-- Right: Avatar -->
+        <div class="hidden md:flex items-center gap-4">
+            <button class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                <span class="material-icons-outlined text-2xl">notifications</span>
+            </button>
+            <div class="relative group">
+                <button
+                    class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border-2 border-black focus:outline-none focus:ring-2 focus:ring-primary">
+                    <img id="userAvatar" alt="User Avatar" class="w-full h-full object-cover"
+                        src="https://ui-avatars.com/api/?name=Admin&background=random" />
+                </button>
+                <div
+                    class="absolute right-0 mt-2 w-48 bg-white border-2 border-black rounded-md shadow-hand opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all transform origin-top-right z-50">
+                    <a class="block px-4 py-2 text-lg hover:bg-purple-100" href="/admin_profile.html">My Profile</a>
+                    <a id="logoutBtn" class="block px-4 py-2 text-lg hover:bg-purple-100 text-red-600" href="#">Log
+                        Out</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <h1 class="text-4xl font-bold relative inline-block">
+                Time Off Requests
+                <svg class="absolute w-full h-3 -bottom-2 left-0 text-primary" preserveaspectratio="none"
+                    viewbox="0 0 100 10">
+                    <path d="M0 5 Q 50 10 100 5" fill="none" stroke="currentColor" stroke-width="3"></path>
+                </svg>
+            </h1>
+            <div class="relative w-full md:w-96">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span class="material-icons-outlined text-gray-400">search</span>
+                </div>
+                <input id="searchInput"
+                    class="block w-full pl-10 pr-3 py-2 border-2 border-black rounded-full leading-5 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary sm:text-lg shadow-sm"
+                    placeholder="Search requests..." type="text" />
+            </div>
+        </div>
+
+        <div class="bg-white border-2 border-black rounded-lg shadow-sketch overflow-hidden w-full">
+            <table class="w-full divide-y-2 divide-black">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-xl font-bold border-r-2 border-black w-1/4">Employee</th>
+                        <th class="px-6 py-4 text-left text-xl font-bold border-r-2 border-black w-1/3">Type & Dates
+                        </th>
+                        <th class="px-6 py-4 text-left text-xl font-bold border-r-2 border-black w-1/3">Reason / Attach
+                        </th>
+                        <th class="px-6 py-4 text-center text-xl font-bold w-48">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="requestsBody" class="divide-y-2 divide-black bg-white">
+                    <tr>
+                        <td colspan="4" class="p-8 text-center text-xl">Loading Requests...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Reject Modal -->
+    <div id="rejectModal"
+        class="fixed inset-0 w-full h-full bg-black bg-opacity-50 hidden items-center justify-center z-[100]">
+        <div class="bg-white p-6 rounded-lg border-2 border-black shadow-sketch max-w-md w-full transform rotate-1">
+            <h2 class="text-2xl font-bold mb-4">Reject Request</h2>
+            <input type="hidden" id="rejectId">
+            <textarea id="rejectReason" class="w-full border-2 border-black rounded p-2 mb-4" rows="3"
+                placeholder="Reason for rejection (Required)"></textarea>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeRejectModal()" class="px-4 py-2 border-2 border-black rounded">Cancel</button>
+                <button onclick="confirmReject()"
+                    class="px-4 py-2 bg-red-600 text-white font-bold border-2 border-black rounded shadow-sketch hover:bg-red-700 transition-all">Reject</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+
+        async function init() {
+            const token = localStorage.getItem('token');
+            if (!token) { window.location.href = '/login.html'; return; }
+
+            try {
+                const res = await fetch(`${API_BASE}/dashboard`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (res.ok) {
+                    const d = await res.json();
+                    document.getElementById('userAvatar').src = d.me.profile_picture || `https://ui-avatars.com/api/?name=${d.me.first_name}`;
+                    if (!['ADMIN', 'HR'].includes(d.me.role)) {
+                        window.location.href = '/dashboard.html';
+                    }
+
+                    // Hide HR Management menu for HR role
+                    if (d.me.role === 'HR') {
+                        const hrLink = document.getElementById('nav-hr-management');
+                        if (hrLink) hrLink.style.display = 'none';
+                    }
+                }
+            } catch (e) {
+                console.error("Auth Fail", e);
+                const current = window.location.pathname;
+                if (!current.includes('login')) {
+                    localStorage.removeItem('token');
+                    window.location.href = '/login.html';
+                }
+            }
+
+            fetchRequests();
+        }
+
+        async function fetchRequests() {
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`${API_BASE}/leaves/admin/all`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (res.ok) {
+                    const data = await res.json();
+                    renderRequests(data);
+                } else {
+                    document.getElementById('requestsBody').innerHTML = `<tr><td colspan="4" class="p-8 text-center text-red-500">Failed to load</td></tr>`;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function renderRequests(data) {
+            const tbody = document.getElementById('requestsBody');
+            if (!data || data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-xl">No Pending Requests</td></tr>`;
+                return;
+            }
+
+            let html = '';
+            data.forEach(req => {
+                const emp = req.Employee || {};
+                const name = `${emp.first_name || ''} ${emp.last_name || ''}`.trim() || 'Unknown';
+                const pic = emp.profile_picture || `https://ui-avatars.com/api/?name=${name}`;
+
+                // Dates
+                const sDate = new Date(req.start_date).toLocaleDateString();
+                const eDate = new Date(req.end_date).toLocaleDateString();
+                const days = Math.ceil((new Date(req.end_date) - new Date(req.start_date)) / (1000 * 60 * 60 * 24)) + 1;
+
+                // Status Logic
+                let actionHtml = '';
+                if (req.status === 'PENDING') {
+                    actionHtml = `
+                        <div class="flex justify-center gap-2">
+                             <button onclick="openReject('${req.id}')" class="p-2 border-2 border-black rounded bg-white text-red-600 hover:bg-red-50 hover:shadow-sketch transition-all" title="Reject">
+                                <span class="material-icons-outlined">close</span>
+                            </button>
+                            <button onclick="approveRequest('${req.id}')" class="p-2 border-2 border-black rounded bg-white text-green-600 hover:bg-green-50 hover:shadow-sketch transition-all" title="Approve">
+                                <span class="material-icons-outlined">check</span>
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    let color = req.status === 'APPROVED' ? 'text-green-600 border-green-600' : 'text-red-600 border-red-600';
+                    let icon = req.status === 'APPROVED' ? 'check_circle' : 'cancel';
+                    actionHtml = `<div class="flex items-center justify-center gap-1 font-bold ${color} border-2 rounded px-2 py-1 transform -rotate-2">
+                        <span class="material-icons-outlined text-lg">${icon}</span> ${req.status}
+                    </div>`;
+                }
+
+                html += `
+                <tr class="hover:bg-purple-50 transition-colors">
+                    <td class="px-6 py-4 border-r-2 border-black">
+                        <div class="flex items-center gap-3">
+                            <div class="h-12 w-12 rounded-full border-2 border-black overflow-hidden flex-shrink-0">
+                                <img src="${pic}" class="h-full w-full object-cover">
+                            </div>
+                            <div>
+                                <div class="font-bold text-lg leading-tight">${name}</div>
+                                <div class="text-sm text-gray-500">Designation</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 border-r-2 border-black">
+                        <div class="font-bold text-primary text-xl mb-1">${req.type}</div>
+                        <div class="text-lg flex items-center gap-1">
+                            <span class="material-icons-outlined text-base">date_range</span>
+                            ${sDate} - ${eDate}
+                            <span class="ml-2 bg-gray-200 text-xs px-2 py-0.5 rounded-full border border-black font-bold">${days} Days</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 border-r-2 border-black">
+                        <div class="text-gray-700 italic mb-2">"${req.reason || 'No reason provided'}"</div>
+                        ${req.attachment_url ? `<a href="${req.attachment_url}" target="_blank" class="text-blue-600 hover:underline flex items-center gap-1 font-bold text-sm"><span class="material-icons-outlined text-sm">attach_file</span> View Attachment</a>` : ''}
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        ${actionHtml}
+                    </td>
+                </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        async function approveRequest(id) {
+            // Confirm approval
+            if (!confirm('Approve this request?')) return;
+
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`${API_BASE}/leaves/admin/${id}/approve`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    Toast.success('Request Approved');
+                    fetchRequests();
+                } else {
+                    const d = await res.json();
+                    Toast.error(d.message);
+                }
+            } catch (e) {
+                console.error(e);
+                Toast.error('Server Error');
+            }
+        }
+
+        function openReject(id) {
+            document.getElementById('rejectId').value = id;
+            document.getElementById('rejectReason').value = '';
+            document.getElementById('rejectModal').classList.remove('hidden');
+            document.getElementById('rejectModal').classList.add('flex');
+        }
+        function closeRejectModal() {
+            document.getElementById('rejectModal').classList.add('hidden');
+            document.getElementById('rejectModal').classList.remove('flex');
+        }
+
+        async function confirmReject() {
+            const id = document.getElementById('rejectId').value;
+            const reason = document.getElementById('rejectReason').value;
+            if (!reason) { Toast.error('Reason required'); return; }
+
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`${API_BASE}/leaves/admin/${id}/reject`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason })
+                });
+                if (res.ok) { Toast.success('Rejected'); closeRejectModal(); fetchRequests(); }
+                else { const d = await res.json(); Toast.error(d.message); }
+            } catch (e) { console.error(e); Toast.error('Error'); }
+        }
+
+        document.getElementById('searchInput').addEventListener('keyup', (e) => {
+            const term = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#requestsBody tr');
+            rows.forEach(r => {
+                r.style.display = r.innerText.toLowerCase().includes(term) ? '' : 'none';
+            });
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        });
+
+        init();
+    </script>
+</body>
+
+</html>

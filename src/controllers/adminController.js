@@ -42,3 +42,23 @@ exports.createEmployee = async (req, res, next) => {
         next(error);
     }
 };
+
+const User = require('../models/User');
+const Employee = require('../models/Employee');
+
+exports.getAdminStats = async (req, res) => {
+    try {
+        const totalEmployees = await Employee.count({ where: { status: 'Active' } });
+        const totalHR = await User.count({ where: { role: 'HR' } });
+        const totalUsers = await User.count();
+
+        res.json({
+            employees: totalEmployees,
+            hrs: totalHR,
+            total_users: totalUsers
+        });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};

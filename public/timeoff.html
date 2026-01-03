@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Employee Time Off - HRMS</title>
+    <!-- RESTORING TAILWIND CDN FOR UI DESIGN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#9C27B0",
+                        secondary: "#7B61FF",
+                        "background-light": "#F8F9FA",
+                        "background-dark": "#121212",
+                        "card-light": "#FFFFFF",
+                        "card-dark": "#1E1E1E",
+                        "paper-light": "#fdfbf7",
+                        "paper-dark": "#2d2d2d",
+                    },
+                    fontFamily: {
+                        display: ["'Gochi Hand'", "cursive"],
+                        body: ["'Gochi Hand'", "cursive"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                        'hand': '255px 15px 225px 15px / 15px 225px 15px 255px',
+                    },
+                    boxShadow: {
+                        'hand': '2px 3px 0px 0px rgba(0,0,0,1)',
+                        'hand-hover': '4px 5px 0px 0px rgba(0,0,0,1)',
+                        'hand-active': '1px 1px 0px 0px rgba(0,0,0,1)',
+                        'sketch': '2px 3px 0px 0px rgba(0,0,0,1)',
+                        'sketch-dark': '2px 3px 0px 0px rgba(255,255,255,0.9)',
+                    }
+                },
+            },
+        };
+    </script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <script src="/js/toast.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Gochi+Hand&amp;family=Spline+Sans:wght@400;600&amp;display=swap"
+        rel="stylesheet" />
+    <style>
+        .hand-border {
+            border: 2px solid black;
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px
+        }
+
+        .dark .hand-border {
+            border-color: #e5e5e5;
+        }
+
+        /* Modal specific styles */
+        body {
+            font-family: 'Gochi Hand', cursive;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            filter: invert(0);
+        }
+
+        .dark input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-200">
+    <div class="texture-overlay"></div>
+
+    <!-- DASHBOARD NAVBAR REUSE START -->
+    <header
+        class="sticky top-0 z-50 bg-white dark:bg-paper-dark border-b-2 border-black dark:border-white w-full px-4 py-3 flex items-center justify-between shadow-sm">
+        <div class="flex items-center gap-4">
+            <div class="cursor-pointer" onclick="window.location.href='/dashboard.html'">
+                <div
+                    class="hand-border bg-primary text-white p-2 px-4 font-bold text-xl tracking-wider transform -rotate-1 flex items-center justify-center">
+                    <img src="/assets/logg_odooHRMS.png" alt="Odoo Logo"
+                        class="h-8 object-contain filter brightness-0 invert" style="filter: brightness(0) invert(1);">
+                </div>
+            </div>
+            <!-- Removed "Odoo HRMS" Text -->
+        </div>
+        <nav class="hidden md:flex items-center gap-4">
+            <a class="hand-border bg-white dark:bg-paper-dark dark:text-white px-6 py-2 text-lg transform hover:-rotate-1 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all border-black dark:border-white"
+                href="/dashboard.html">
+                Employees
+            </a>
+            <a class="hand-border bg-white dark:bg-paper-dark dark:text-white px-6 py-2 text-lg transform hover:rotate-1 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all border-black dark:border-white"
+                href="/attendance.html">
+                Attendance
+            </a>
+            <a class="hand-border bg-primary text-white px-6 py-2 text-lg transform hover:-rotate-1 transition-all shadow-hand border-black dark:border-white"
+                href="#">
+                Time Off
+            </a>
+        </nav>
+        <div class="flex items-center gap-4">
+            <!-- Removed attendanceSystray div content, kept ID for JS safety but empty/hidden -->
+            <div id="attendanceSystray" class="hidden"></div>
+
+            <div class="relative group">
+                <button
+                    class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border-2 border-black dark:border-white focus:outline-none focus:ring-2 focus:ring-primary">
+                    <img id="userAvatar" alt="User Avatar" class="w-full h-full object-cover"
+                        src="https://ui-avatars.com/api/?name=User&background=random" />
+                </button>
+                <div
+                    class="absolute right-0 mt-2 w-48 bg-white dark:bg-paper-dark border-2 border-black dark:border-white rounded-md shadow-hand opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all transform origin-top-right z-50">
+                    <a class="block px-4 py-2 text-lg hover:bg-purple-100 dark:hover:bg-purple-900"
+                        href="/profile.html">My
+                        Profile</a>
+                    <a id="logoutBtn"
+                        class="block px-4 py-2 text-lg hover:bg-red-100 dark:hover:bg-red-900 text-red-600" href="#">Log
+                        Out</a>
+                </div>
+            </div>
+            <button class="md:hidden p-2 text-gray-700 dark:text-gray-300">
+                <span class="material-icons-outlined text-3xl">menu</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
+        <!-- Header & Balances as before -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
+            <div class="flex flex-col gap-2">
+                <h1 class="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white relative inline-block">
+                    Time Off
+                    <svg class="absolute w-full h-3 -bottom-1 left-0 text-primary opacity-60" preserveAspectRatio="none"
+                        viewBox="0 0 100 10">
+                        <path d="M0 5 Q 50 10 100 5" fill="none" stroke="currentColor" stroke-width="3"></path>
+                    </svg>
+                </h1>
+                <button onclick="openModal()"
+                    class="mt-4 group relative bg-primary text-white text-2xl px-6 py-2 rounded-sm border-2 border-black dark:border-white shadow-sketch dark:shadow-sketch-dark hover:shadow-sketch-hover dark:hover:shadow-none hover:-translate-y-0.5 transition-all w-max font-bold">
+                    + NEW REQUEST
+                </button>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-6 md:gap-12 text-xl sm:text-2xl">
+                <div class="flex flex-col items-end">
+                    <span class="text-blue-600 dark:text-blue-400 font-bold">Paid Time Off</span>
+                    <span class="text-gray-600 dark:text-gray-300"><span id="balPTO">--</span> Days Available</span>
+                </div>
+                <div class="flex flex-col items-end">
+                    <span class="text-purple-600 dark:text-purple-400 font-bold">Sick Time Off</span>
+                    <span class="text-gray-600 dark:text-gray-300"><span id="balSick">--</span> Days Available</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div
+            class="bg-white dark:bg-card-dark border-2 border-black dark:border-white shadow-sketch dark:shadow-sketch-dark overflow-hidden rounded-sm relative">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse" id="leavesTable">
+                    <thead class="bg-paper-light dark:bg-paper-dark border-b-2 border-black dark:border-white">
+                        <tr>
+                            <th class="p-4 text-xl font-bold border-r-2 border-black dark:border-white">Name</th>
+                            <th class="p-4 text-xl font-bold border-r-2 border-black dark:border-white">Start Date</th>
+                            <th class="p-4 text-xl font-bold border-r-2 border-black dark:border-white">End Date</th>
+                            <th class="p-4 text-xl font-bold border-r-2 border-black dark:border-white">Time Off Type
+                            </th>
+                            <th class="p-4 text-xl font-bold">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y-2 divide-gray-300 dark:divide-gray-600 bg-white dark:bg-card-dark"
+                        id="tableBody">
+                        <tr>
+                            <td colspan="5" class="p-8 text-center text-xl">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- NEW ADVANCED MODAL -->
+    <div id="leaveModal" aria-hidden="true"
+        class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 items-center justify-center p-4">
+        <div
+            class="relative w-full max-w-2xl bg-card-light dark:bg-card-dark border-2 border-black dark:border-white rounded-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] p-6 md:p-8 transition-all duration-300 transform scale-100">
+            <div
+                class="flex justify-between items-center mb-6 pb-2 border-b-2 border-black dark:border-white border-dashed">
+                <h2 class="text-2xl md:text-3xl font-bold text-black dark:text-white tracking-wide">
+                    Time off Type Request
+                </h2>
+                <button onclick="closeModal()"
+                    class="text-black dark:text-white hover:text-primary transition-colors focus:outline-none p-1 rounded-full border-2 border-transparent hover:border-black dark:hover:border-white">
+                    <span class="material-icons-outlined text-2xl font-bold">close</span>
+                </button>
+            </div>
+
+            <form id="leaveForm" class="space-y-6">
+                <!-- Employee Readonly -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                    <label class="text-xl text-black dark:text-white" for="employeeInput">Employee</label>
+                    <div class="md:col-span-2 relative">
+                        <input
+                            class="w-full bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400 border-2 border-black dark:border-white rounded px-3 py-2 focus:outline-none focus:ring-0 cursor-not-allowed text-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)]"
+                            id="employeeInput" readonly type="text" value="Loading..." />
+                    </div>
+                </div>
+
+                <!-- Type Select -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                    <label class="text-xl text-black dark:text-white" for="leaveType">Time off Type</label>
+                    <div class="md:col-span-2 relative">
+                        <select id="leaveType" required
+                            class="w-full bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border-2 border-black dark:border-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary appearance-none text-lg shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all">
+                            <option value="Paid Time Off">Paid Time Off</option>
+                            <option value="Sick Leave">Sick Leave</option>
+                            <option value="Unpaid Leave">Unpaid Leave</option>
+                            <option value="Maternity Leave">Maternity Leave</option>
+                        </select>
+                        <div
+                            class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-black dark:text-white">
+                            <span class="material-icons-outlined">expand_more</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Validity Period -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start md:items-center">
+                    <label class="text-xl text-black dark:text-white mt-2 md:mt-0">Validity Period</label>
+                    <div class="md:col-span-2 flex flex-col sm:flex-row items-center gap-3">
+                        <div class="relative w-full">
+                            <input id="startDate" required
+                                class="w-full bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border-2 border-black dark:border-white rounded px-2 py-2 focus:outline-none focus:ring-2 focus:ring-primary text-lg shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)]"
+                                type="date" />
+                        </div>
+                        <span class="text-black dark:text-white font-bold text-lg">To</span>
+                        <div class="relative w-full">
+                            <input id="endDate" required
+                                class="w-full bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border-2 border-black dark:border-white rounded px-2 py-2 focus:outline-none focus:ring-2 focus:ring-primary text-lg shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)]"
+                                type="date" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Allocation -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                    <label class="text-xl text-black dark:text-white" for="allocation">Allocation</label>
+                    <div class="md:col-span-2 flex items-center gap-4">
+                        <input id="allocation" readonly
+                            class="w-24 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border-2 border-black dark:border-white rounded px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-primary text-lg shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)]"
+                            type="text" value="0.00" />
+                        <span class="text-blue-600 dark:text-blue-400 text-xl font-bold">Days</span>
+                    </div>
+                </div>
+
+                <!-- Attachment -->
+                <div id="attachmentRow" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center transition-all">
+                    <label class="text-xl text-black dark:text-white font-bold">Attachment</label>
+                    <div class="md:col-span-2 flex items-center gap-3">
+                        <label
+                            class="cursor-pointer group relative inline-flex items-center justify-center p-2 rounded border-2 border-black dark:border-white bg-blue-500 hover:bg-blue-600 text-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all">
+                            <span class="material-icons-outlined text-2xl">upload_file</span>
+                            <input id="fileInput" class="hidden" type="file" accept=".pdf,.jpg,.jpeg,.png" />
+                        </label>
+                        <span id="fileName" class="text-gray-600 dark:text-gray-300 text-lg leading-tight italic">
+                            (Upload Document)
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="pt-6 flex gap-4 mt-8">
+                    <button type="submit" id="submitBtn"
+                        class="bg-primary hover:bg-purple-700 text-white text-xl px-6 py-2 rounded border-2 border-black dark:border-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] transition-all font-bold tracking-wide">
+                        Submit
+                    </button>
+                    <button type="button" onclick="closeModal()"
+                        class="bg-white dark:bg-card-dark text-black dark:text-white text-xl px-6 py-2 rounded border-2 border-black dark:border-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] hover:bg-gray-100 dark:hover:bg-gray-800 active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] transition-all font-bold tracking-wide">
+                        Discard
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- Shared Systray Logic (Modified to be hidden) ---
+        const API_BASE = '/api';
+        let checkInTimer = null;
+        let checkInStartTime = null;
+        let userData = null;
+
+        async function initSystray() {
+            const token = localStorage.getItem('token');
+            if (!token) { window.location.href = '/login.html'; return; }
+
+            try {
+                // Also fetching dashboard to get "me" and attendance
+                const res = await fetch(`${API_BASE}/dashboard`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (res.ok) {
+                    const data = await res.json();
+                    userData = data.me;
+                    updateProfile(data.me);
+                    // updateSystray(data.attendance); // REMOVED PER USER REQUEST
+                    loadLeaves();
+                } else if (res.status === 401) {
+                    window.location.href = '/login.html';
+                }
+            } catch (e) { console.error('Systray Error', e); }
+        }
+
+        function updateProfile(user) {
+            if (user.profile_picture) document.getElementById('userAvatar').src = user.profile_picture;
+            // Auto-fill Modal Name using the composite 'name' if available, or first_name + last_name
+            if (user) {
+                const displayName = user.name || (user.first_name ? `${user.first_name} ${user.last_name}` : 'Unknown Employee');
+                document.getElementById('employeeInput').value = displayName;
+            }
+        }
+
+        // --- Modal Logic ---
+
+        function openModal() {
+            document.getElementById('leaveModal').classList.remove('hidden');
+            document.getElementById('leaveModal').classList.add('flex');
+            // Set default date to today and tomorrow
+            const today = new Date().toISOString().split('T')[0];
+            const tomo = new Date(); tomo.setDate(tomo.getDate() + 1);
+            const tomorrow = tomo.toISOString().split('T')[0];
+
+            if (!document.getElementById('startDate').value) {
+                document.getElementById('startDate').value = today;
+                document.getElementById('endDate').value = tomorrow;
+                calcAllocation();
+            }
+
+            // Ensure attachment logic is synced
+            const type = document.getElementById('leaveType').value;
+            // Attachment is always visible now
+            if (type === 'Sick Leave') {
+                document.getElementById('fileInput').required = true;
+            } else {
+                document.getElementById('fileInput').required = false;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('leaveModal').classList.add('hidden');
+            document.getElementById('leaveModal').classList.remove('flex');
+            document.getElementById('leaveForm').reset();
+            // document.getElementById('attachmentRow').classList.add('hidden'); // Removed hiding
+            document.getElementById('fileName').innerText = "(Upload Document)";
+            if (userData) {
+                const displayName = userData.name || (userData.first_name ? `${userData.first_name} ${userData.last_name}` : 'Unknown Employee');
+                document.getElementById('employeeInput').value = displayName;
+            }
+        }
+
+        function calcAllocation() {
+            const s = document.getElementById('startDate').value;
+            const e = document.getElementById('endDate').value;
+            if (!s || !e) return;
+
+            const d1 = new Date(s);
+            const d2 = new Date(e);
+
+            if (d1 > d2) {
+                document.getElementById('allocation').value = '0.00';
+                return;
+            }
+
+            let days = 0;
+            let current = new Date(d1);
+            while (current <= d2) {
+                const day = current.getDay();
+                if (day !== 0 && day !== 6) days++; // Exclude Sun/Sat
+                current.setDate(current.getDate() + 1);
+            }
+            document.getElementById('allocation').value = days.toFixed(2);
+        }
+
+        // Event Listeners
+        document.getElementById('startDate').addEventListener('change', calcAllocation);
+        document.getElementById('endDate').addEventListener('change', calcAllocation);
+
+        document.getElementById('leaveType').addEventListener('change', (e) => {
+            const type = e.target.value;
+            // const row = document.getElementById('attachmentRow');
+            if (type === 'Sick Leave') {
+                // row.classList.remove('hidden');
+                // row.classList.add('grid');
+                document.getElementById('fileInput').required = true;
+            } else {
+                // row.classList.add('hidden');
+                // row.classList.remove('grid');
+                document.getElementById('fileInput').required = false;
+            }
+        });
+
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) document.getElementById('fileName').innerText = file.name;
+            else document.getElementById('fileName').innerText = "(Upload Document)";
+        });
+
+        async function loadLeaves() {
+            const token = localStorage.getItem('token');
+            try {
+                const bRes = await fetch(`${API_BASE}/leaves/balance`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const bData = await bRes.json();
+                document.getElementById('balPTO').innerText = bData.paid_time_off;
+                document.getElementById('balSick').innerText = bData.sick_leave;
+            } catch (e) { }
+
+            try {
+                const hRes = await fetch(`${API_BASE}/leaves/me`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const leaves = await hRes.json();
+                renderTable(leaves);
+            } catch (e) { }
+        }
+
+        function renderTable(leaves) {
+            const tbody = document.getElementById('tableBody');
+            if (leaves.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-xl text-gray-500">No leave requests found.</td></tr>'; return; }
+            let html = '';
+            leaves.forEach(l => {
+                const sDate = new Date(l.start_date).toLocaleDateString('en-GB');
+                const eDate = new Date(l.end_date).toLocaleDateString('en-GB');
+                let statusBadge = '';
+                if (l.status === 'APPROVED' || l.status === 'TAKEN') statusBadge = 'bg-green-100 text-green-800 border-green-200';
+                else if (l.status === 'PENDING') statusBadge = 'bg-yellow-100 text-yellow-800 border-yellow-200';
+                else statusBadge = 'bg-red-100 text-red-800 border-red-200';
+
+                const displayName = userData ? (userData.name || `${userData.first_name} ${userData.last_name}`) : 'Me';
+
+                html += `<tr class="hover:bg-purple-50 dark:hover:bg-gray-800 transition-colors group">
+                    <td class="p-4 font-bold border-r-2 border-black dark:border-white text-lg">${displayName}</td>
+                    <td class="p-4 text-lg border-r border-gray-300 dark:border-gray-600">${sDate}</td>
+                    <td class="p-4 text-lg border-r-2 border-black dark:border-white">${eDate}</td>
+                    <td class="p-4 text-lg border-r border-gray-300 dark:border-gray-600 font-bold text-primary">${l.type}</td>
+                    <td class="p-4"><span class="px-3 py-1 inline-flex text-base font-bold rounded-full border ${statusBadge}">${l.status}</span></td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        document.getElementById('leaveForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = localStorage.getItem('token');
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Submitting...';
+
+            const formData = new FormData();
+            formData.append('type', document.getElementById('leaveType').value);
+            formData.append('start_date', document.getElementById('startDate').value);
+            formData.append('end_date', document.getElementById('endDate').value);
+
+            const file = document.getElementById('fileInput').files[0];
+            if (file) formData.append('attachment', file);
+
+            try {
+                const res = await fetch(`${API_BASE}/leaves/request`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                const json = await res.json();
+                if (res.ok) {
+                    Toast.success('Leave Request Submitted Successfully');
+                    closeModal();
+                    loadLeaves();
+                } else {
+                    Toast.error(json.message || 'Error submitting request');
+                }
+            } catch (e) {
+                console.error(e);
+                Toast.error('An unexpected error occurred');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Submit';
+            }
+        });
+
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('token');
+                window.location.replace('/login.html');
+            });
+        }
+
+        initSystray();
+    </script>
+</body>
+
+</html>

@@ -17,6 +17,11 @@ const Employee = sequelize.define('Employee', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    email: { // Work Email
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true
+    },
     phone: {
         type: DataTypes.STRING,
         allowNull: false
@@ -83,6 +88,44 @@ const Employee = sequelize.define('Employee', {
     address: {
         type: DataTypes.TEXT,
         allowNull: true
+    },
+    // New Fields for Admin Profile Management
+    mobile: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    company: {
+        type: DataTypes.STRING,
+        defaultValue: 'Acme Corp',
+        allowNull: true
+    },
+    location: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    about: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
+    job_love: {
+        type: DataTypes.TEXT, // "What I love about my job"
+        allowNull: true
+    },
+    interests: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
+    skills: {
+        type: DataTypes.JSON, // Array of { name: 'React', type: 'Technical' } or just strings
+        allowNull: true
+    },
+    certifications: {
+        type: DataTypes.JSON, // Array of { name, date, expiry }
+        allowNull: true
+    },
+    status: {
+        type: DataTypes.ENUM('Active', 'Inactive'),
+        defaultValue: 'Active'
     }
 }, {
     timestamps: true,

@@ -11,7 +11,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Gochi+Hand&amp;family=Spline+Sans:wght@400;600&amp;display=swap"
         rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -67,8 +67,8 @@
             <div class="cursor-pointer" onclick="window.location.href='/dashboard.html'">
                 <div
                     class="hand-border bg-primary text-white p-2 px-4 font-bold text-xl tracking-wider transform -rotate-1 flex items-center justify-center">
-                    <span class="material-icons-outlined text-2xl">architecture</span>
-                    <span class="ml-2">HR.Sketch</span>
+                    <img src="/assets/logg_odooHRMS.png" alt="Odoo Logo"
+                        class="h-8 object-contain filter brightness-0 invert">
                 </div>
             </div>
         </div>
@@ -82,7 +82,7 @@
                 Attendance
             </a>
             <a class="hand-border bg-white dark:bg-paper-dark dark:text-white px-6 py-2 text-lg transform hover:-rotate-1 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all border-black dark:border-white"
-                href="#">
+                href="/timeoff.html">
                 Time Off
             </a>
         </nav>
@@ -427,6 +427,7 @@
                     </td>
                     <td class="p-4 border-r border-gray-300 dark:border-gray-600 text-center font-bold text-xl ${rec.workHours === '-' ? 'text-gray-400 italic' : ''}">
                          ${rec.workHours}
+                         ${rec.isHighlight ? `<div class="text-xs text-green-600 dark:text-green-400 font-normal mt-1">(Includes ${rec.extraHours} OT)</div>` : ''}
                     </td>
                     <td class="p-4 text-center font-bold text-xl flex items-center justify-center gap-1 ${rec.isHighlight ? 'text-green-600 dark:text-green-400' : 'text-gray-400 italic'}">
                          ${rec.extraHours}
@@ -440,6 +441,15 @@
 
         initPage();
 
+        // Logout Logic
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('token');
+                window.location.replace('/login.html');
+            });
+        }
     </script>
 </body>
 

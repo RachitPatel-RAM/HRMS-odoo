@@ -92,6 +92,7 @@ class UserService {
             // 5. Create User Record
             const user = await User.create({
                 email,
+                login_id: employeeId, // Store generated ID as login_id
                 password_hash: newPasswordHash,
                 role: 'EMPLOYEE',
                 employee_id: employee.id,

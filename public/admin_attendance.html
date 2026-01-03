@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Attendance Spreadsheet - HRMS</title>
+    <link href="/css/output.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&amp;display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="/js/toast.js"></script>
+
+    <style>
+        @font-face {
+            font-family: 'Gochi Hand';
+            src: url('/fonts/gochi.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        .sketch-border {
+            border: 2px solid currentColor;
+            border-radius: 2px 5px 3px 6px
+        }
+
+        .sketch-border-b {
+            border-bottom: 2px solid currentColor
+        }
+
+        .sketch-input-shadow {
+            box-shadow: 1px 1px 0 0 rgba(0, 0, 0, 1)
+        }
+
+        .sketch-filter-control {
+            border: 1.5px solid currentColor;
+            border-radius: 4px 2px 5px 3px;
+            padding: 2px 4px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            box-shadow: 1px 1px 0 0 rgba(0, 0, 0, 1)
+        }
+
+        .sketch-filter-control:hover {
+            box-shadow: 2px 2px 0 0 rgba(0, 0, 0, 1);
+            transform: translate(-1px, -1px)
+        }
+
+        .sketch-select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuAtrnCkZvYUVVfvKKrpEPH72j9T3SjLmLgLifVg9OrBRiLWk9ZYoiwdHBIQZY-g1O3_oxlPcOE9mr-vIJeEUJ7vReqDovrZm6RqMZxm4p7zW1n7HOvLQHQUYjhCxUSXHqDajAT0kzaPzZT-Yqnj5RFlynPj7mnowVAmA4jkDNB9B308Tj8GT2zh0phOn681eHu2D7aaZ938ZBJ-4-UmTX5CtX-ONdRlPpu71cPsQOe8zOS3veB-h7pyVMxnceDjzVPZAK1qUVW2IEo);
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1.5em
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #7B61FF;
+            border-radius: 5px;
+            border: 1px solid black
+        }
+
+        body {
+            font-family: 'Gochi Hand', cursive;
+        }
+    </style>
+</head>
+
+<body class="bg-white text-gray-900 font-body min-h-screen flex flex-col transition-colors duration-200">
+
+    <!-- Header / Navbar from Admin Dashboard -->
+    <header
+        class="sticky top-0 z-50 bg-white border-b-2 border-black px-6 py-2 flex justify-between items-center shadow-md relative">
+        <!-- Left: Logo -->
+        <div class="flex items-center gap-3">
+            <div class="flex items-center justify-center p-1">
+                <img src="/assets/logg_odooHRMS.png" alt="Odoo Logo" class="h-20 w-20 object-contain">
+            </div>
+        </div>
+
+        <!-- Center: Navigation -->
+        <nav class="hidden md:flex items-center gap-6 absolute left-1/2 transform -translate-x-1/2">
+            <a href="/admin-dashboard.html"
+                class="bg-white text-black px-6 py-2 text-xl font-bold border-2 border-black transform -rotate-1 shadow-[2px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all rounded-sm font-hand">
+                Employees
+            </a>
+            <!-- Active Tab: Attendance -->
+            <a href="/admin_attendance.html"
+                class="bg-primary text-white px-6 py-2 text-xl font-bold border-2 border-black transform rotate-1 shadow-[2px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:bg-purple-700 transition-all rounded-sm font-hand">
+                Attendance
+            </a>
+            <a href="/admin_timeoff.html"
+                class="bg-white text-black px-6 py-2 text-xl font-bold border-2 border-black transform -rotate-1 shadow-[2px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:bg-gray-50 transition-all rounded-sm font-hand">
+                Time Off
+            </a>
+            <a href="/admin_hr_management.html" id="nav-hr-management"
+                class="bg-white text-black px-6 py-2 text-xl font-bold border-2 border-black transform rotate-1 shadow-[2px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:bg-gray-50 transition-all rounded-sm font-hand">
+                HR Management
+            </a>
+        </nav>
+
+        <!-- Right: Avatar -->
+        <div class="hidden md:flex items-center gap-4">
+            <button class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                <span class="material-icons-outlined text-2xl">notifications</span>
+            </button>
+            <div class="relative group">
+                <button
+                    class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border-2 border-black focus:outline-none focus:ring-2 focus:ring-primary">
+                    <img id="userAvatar" alt="User Avatar" class="w-full h-full object-cover"
+                        src="https://ui-avatars.com/api/?name=Admin&background=random" />
+                </button>
+                <div
+                    class="absolute right-0 mt-2 w-48 bg-white border-2 border-black rounded-md shadow-hand opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all transform origin-top-right z-50">
+                    <a class="block px-4 py-2 text-lg hover:bg-purple-100" href="/admin_profile.html">My Profile</a>
+                    <a id="logoutBtn" class="block px-4 py-2 text-lg hover:bg-purple-100 text-red-600" href="#">Log
+                        Out</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 w-full max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+            <h1 class="text-4xl font-bold relative inline-block">
+                Attendance Spreadsheet
+                <svg class="absolute w-full h-3 -bottom-2 left-0 text-primary" preserveaspectratio="none"
+                    viewbox="0 0 100 10">
+                    <path d="M0 5 Q 50 10 100 5" fill="none" stroke="currentColor" stroke-width="3"></path>
+                </svg>
+            </h1>
+            <div class="relative w-full md:w-96">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span class="material-symbols-outlined text-gray-400">search</span>
+                </div>
+                <input id="searchInput"
+                    class="block w-full pl-10 pr-3 py-2 border-2 border-black rounded-full leading-5 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary sm:text-lg shadow-sm"
+                    placeholder="Search employee or notes..." type="text" />
+            </div>
+        </div>
+
+        <div
+            class="bg-white border-2 border-black p-4 mb-6 shadow-sketch flex flex-wrap gap-4 items-center justify-between rounded-md transform rotate-0.5">
+            <div class="flex items-center gap-4">
+                <div class="flex gap-2">
+                    <button onclick="changeWeek(-1)"
+                        class="w-10 h-10 flex items-center justify-center border-2 border-black hover:bg-primary hover:text-white transition-colors rounded hover:shadow-sketch active:translate-y-1 active:shadow-none">
+                        <span class="material-symbols-outlined">chevron_left</span>
+                    </button>
+                    <button onclick="changeWeek(1)"
+                        class="w-10 h-10 flex items-center justify-center border-2 border-black hover:bg-primary hover:text-white transition-colors rounded hover:shadow-sketch active:translate-y-1 active:shadow-none">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </button>
+                </div>
+                <div class="relative group">
+                    <span id="dateRangeDisplay"
+                        class="px-4 py-2 bg-purple-100 text-primary border-2 border-primary rounded-lg text-xl font-bold flex items-center gap-2 shadow-[2px_2px_0px_0px_rgba(124,58,237,1)]">
+                        Loading...
+                    </span>
+                </div>
+                <button onclick="resetToCurrentWeek()"
+                    class="px-4 py-2 bg-primary text-white text-xl font-bold border-2 border-black rounded transform -rotate-2 hover:-translate-y-1 transition-transform shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    This Week
+                </button>
+            </div>
+            <div class="flex gap-3 relative">
+                <button onclick="toggleExportMenu()"
+                    class="px-4 py-2 border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors font-bold text-lg rounded-full flex items-center gap-2">
+                    <span class="material-symbols-outlined text-lg">file_download</span> Export
+                </button>
+                <div id="exportMenu"
+                    class="absolute right-0 top-12 bg-white border-2 border-black rounded shadow-sketch p-2 hidden flex-col w-48 z-50">
+                    <button onclick="exportData('week')" class="text-left px-4 py-2 hover:bg-gray-100 font-bold">Current
+                        Week</button>
+                    <button onclick="exportData('month')"
+                        class="text-left px-4 py-2 hover:bg-gray-100 font-bold">Current Month</button>
+                    <button onclick="exportData('year')" class="text-left px-4 py-2 hover:bg-gray-100 font-bold">Current
+                        Year</button>
+                    <button onclick="exportData('all')"
+                        class="text-left px-4 py-2 hover:bg-gray-100 font-bold text-primary">Whole Data</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Table Container -->
+        <div class="w-full overflow-hidden border-2 border-black rounded-lg shadow-sketch bg-white">
+            <div class="overflow-x-auto w-full max-h-[70vh]">
+                <table class="min-w-max border-collapse w-full text-gray-900">
+                    <thead class="bg-gray-100 sticky top-0 z-30">
+                        <tr id="headerRowDays">
+                            <!-- Populated via JS -->
+                        </tr>
+                        <tr id="headerRowCols">
+                            <!-- Populated via JS -->
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceBody" class="bg-white divide-y-2 divide-black">
+                        <tr>
+                            <td colspan="100" class="p-8 text-center text-xl">Loading Attendance Data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div
+                class="bg-gray-50 px-6 py-3 border-t-2 border-black flex items-center justify-between sticky bottom-0 z-30">
+                <span class="text-lg text-gray-600" id="showingText">Showing entries...</span>
+                <div class="flex gap-2">
+                    <button class="px-3 py-1 border border-black rounded hover:bg-white">Prev</button>
+                    <button class="px-3 py-1 bg-primary text-white border border-black rounded font-bold">1</button>
+                    <button class="px-3 py-1 border border-black rounded hover:bg-white">Next</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div class="fixed bottom-10 left-10 pointer-events-none opacity-20 transform -rotate-12 hidden lg:block">
+        <svg class="text-primary" height="100" viewbox="0 0 100 100" width="100">
+            <path d="M10 10 Q 50 90 90 10" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="4">
+            </path>
+            <path d="M10 90 Q 50 10 90 90" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="4">
+            </path>
+        </svg>
+    </div>
+
+    <!-- Edit Modal (Reused) -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-lg border-2 border-black shadow-sketch max-w-md w-full transform rotate-1">
+            <h2 class="text-2xl font-bold mb-4">Edit Attendance</h2>
+            <input type="hidden" id="editEmpId"><input type="hidden" id="editDate">
+            <div class="space-y-4">
+                <div><label class="block font-bold mb-1">Check In</label><input id="editCheckIn"
+                        class="w-full border-2 border-black rounded px-2 py-1" type="time" step="1">
+                </div>
+                <div><label class="block font-bold mb-1">Check Out</label><input id="editOut"
+                        class="w-full border-2 border-black rounded px-2 py-1" type="time" step="1">
+                </div>
+                <div><label class="block font-bold mb-1">Lunch (Hrs)</label><input id="editLunch"
+                        class="w-full border-2 border-black rounded px-2 py-1" type="number" step="0.5"></div>
+                <div><label class="block font-bold mb-1">Notes</label><input id="editNotes"
+                        class="w-full border-2 border-black rounded px-2 py-1" type="text"></div>
+                <div>
+                    <label class="block font-bold mb-1">OT Status</label>
+                    <select id="editOtStatus" class="w-full border-2 border-black rounded px-2 py-1">
+                        <option value="N/A">N/A</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                </div>
+                <div><label class="block font-bold mb-1 text-primary">Reason <span class="text-red-500">*</span></label>
+                    <textarea id="editReason" class="w-full border-2 border-primary rounded px-2 py-1"
+                        rows="2"></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end gap-4 mt-6">
+                <button onclick="closeEditModal()" class="px-4 py-2 border-2 border-black rounded">Cancel</button>
+                <button onclick="saveAttendance()"
+                    class="px-4 py-2 bg-primary text-white font-bold border-2 border-black rounded shadow-sketch">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let currentStartDate = getMonday(new Date());
+        let allEmployeesData = [];
+
+        function getMonday(d) {
+            d = new Date(d);
+            const day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6 : 1);
+            const mon = new Date(d.setDate(diff)); mon.setHours(0, 0, 0, 0); return mon;
+        }
+
+        async function init() {
+            const token = localStorage.getItem('token');
+            if (!token) { window.location.href = '/login.html'; return; }
+
+            try {
+                // Keep the check for user data/role
+                const res = await fetch(`${API_BASE}/dashboard`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (res.ok) {
+                    const d = await res.json();
+                    document.getElementById('userAvatar').src = d.me.profile_picture || `https://ui-avatars.com/api/?name=${d.me.first_name}`;
+
+                    if (!['ADMIN', 'HR'].includes(d.me.role)) {
+                        window.location.href = '/dashboard.html';
+                    }
+
+                    // Hide HR Management menu for HR role
+                    if (d.me.role === 'HR') {
+                        const hrLink = document.getElementById('nav-hr-management');
+                        if (hrLink) hrLink.style.display = 'none';
+                    }
+                }
+            } catch (e) {
+                console.error("Auth Check Failed", e);
+            }
+
+            renderHeader();
+            fetchWeeklyData();
+        }
+
+        function renderHeader() {
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const start = new Date(currentStartDate);
+            document.getElementById('dateRangeDisplay').innerText = `${start.toLocaleDateString()} - ${new Date(start.getTime() + 6 * 86400000).toLocaleDateString()}`;
+
+            let daysHtml = `<th class="sticky left-0 bg-gray-100 px-4 py-3 text-left text-xl font-bold tracking-wider border-r-4 border-black z-20" rowspan="2" scope="col"><div class="flex items-center gap-2">Emp <span class="material-symbols-outlined sketch-filter-control">filter_alt</span></div></th>`;
+            let colsHtml = ``;
+
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(start); d.setDate(d.getDate() + i);
+                const dayStr = `${days[i]}, ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+
+                // Day Group Header
+                daysHtml += `<th class="px-2 py-3 text-center text-xl font-bold tracking-wider border-b-2 border-r-4 border-black bg-gray-50" colspan="5" scope="colgroup">
+            <div class="flex items-center justify-between px-2"><span class="material-symbols-outlined text-base">calendar_today</span><span>${dayStr}</span><span class="material-symbols-outlined sketch-filter-control text-sm">filter_alt</span></div></th>`;
+
+                // Columns
+                colsHtml += `
+            <th class="px-1 py-3 text-center text-xs font-bold uppercase tracking-wider border-b-2 border-r border-gray-300">In</th>
+            <th class="px-1 py-3 text-center text-xs font-bold uppercase tracking-wider border-b-2 border-r border-gray-300">Out</th>
+            <th class="px-1 py-3 text-center text-xs font-bold uppercase tracking-wider border-b-2 border-r border-gray-300 w-16">Lunch</th>
+            <th class="px-1 py-3 text-center text-xs font-bold uppercase tracking-wider border-b-2 border-r border-gray-300">OT</th>
+            <th class="px-1 py-3 text-center text-xs font-bold uppercase tracking-wider border-b-2 border-r-4 border-black w-24">Notes</th>`;
+            }
+            document.getElementById('headerRowDays').innerHTML = daysHtml;
+            document.getElementById('headerRowCols').innerHTML = colsHtml;
+        }
+
+        async function fetchWeeklyData() {
+            const token = localStorage.getItem('token');
+            const startStr = currentStartDate.toISOString().split('T')[0];
+            const end = new Date(currentStartDate); end.setDate(end.getDate() + 6);
+            const endStr = end.toISOString().split('T')[0];
+
+            document.getElementById('attendanceBody').innerHTML = `<tr><td colspan="100" class="p-8 text-center text-xl">Loading...</td></tr>`;
+
+            try {
+                const res = await fetch(`${API_BASE}/attendance/admin/weekly?start_date=${startStr}&end_date=${endStr}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    allEmployeesData = await res.json();
+                    renderTable(allEmployeesData);
+                } else {
+                    document.getElementById('attendanceBody').innerHTML = `<tr><td colspan="100" class="p-8 text-center text-red-500">Failed to load data</td></tr>`;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('attendanceBody');
+            let html = '';
+            if (!data || data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="100" class="p-8 text-center">No Data Found</td></tr>`;
+                return;
+            }
+
+            data.forEach(empRecord => {
+                const emp = empRecord.employee;
+                const attMap = empRecord.attendance || {};
+
+                html += `<tr class="hover:bg-purple-50 transition-colors cursor-pointer group">
+            <td onclick="window.location.href='/employee_profile.html?id=${emp.id}'" class="sticky left-0 bg-white px-4 py-3 whitespace-nowrap border-r-4 border-black z-10 shadow-[4px_0_5px_-2px_rgba(0,0,0,0.1)]">
+            <div class="flex items-center">
+            <div class="flex-shrink-0 h-10 w-10 border-2 border-gray-400 rounded-full overflow-hidden mr-3">
+             <img class="h-10 w-10 rounded-full object-cover" src="${emp.profile_picture || 'https://ui-avatars.com/api/?name=' + emp.name}"/>
+            </div>
+            <div class="text-lg font-medium text-gray-900 group-hover:text-primary transition-colors">${emp.name}</div>
+            </div></td>`;
+
+                for (let i = 0; i < 7; i++) {
+                    const d = new Date(currentStartDate); d.setDate(d.getDate() + i);
+                    const dateStr = d.toISOString().split('T')[0];
+                    const dayAtt = attMap[dateStr] || {};
+
+                    // Formats
+                    const inTime = dayAtt.check_in_time ? new Date(dayAtt.check_in_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
+                    const outTime = dayAtt.check_out_time ? new Date(dayAtt.check_out_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
+
+                    // Lunch Default Logic
+                    let lunchDisplay = '<span class="text-gray-400">2h</span>';
+                    if (dayAtt.lunch_duration !== undefined && dayAtt.lunch_duration !== null) {
+                        lunchDisplay = `<span class="font-bold text-gray-800">${dayAtt.lunch_duration}h</span>`;
+                    } else if (dayAtt.check_in_time) {
+                        lunchDisplay = '<span class="text-gray-400">2h</span>';
+                    }
+
+                    // OT Logic
+                    let otDisplay = '-';
+                    if (dayAtt.overtime_hours > 0) {
+                        otDisplay = `<span class="text-white bg-primary px-1 rounded font-bold text-xs">+${dayAtt.overtime_hours}h</span>`;
+                    }
+
+                    // Edit Params
+                    const checkInVal = dayAtt.check_in_time ? new Date(dayAtt.check_in_time).toTimeString().substr(0, 5) : '';
+                    const checkOutVal = dayAtt.check_out_time ? new Date(dayAtt.check_out_time).toTimeString().substr(0, 5) : '';
+                    const lunchVal = dayAtt.lunch_duration || '2';
+                    const notesVal = dayAtt.notes || '';
+                    const otStatusVal = dayAtt.overtime_status || 'N/A';
+
+                    const cellAttrs = `onclick="openEdit('${emp.id}', '${dateStr}', '${checkInVal}', '${checkOutVal}', '${lunchVal}', '${notesVal.replace(/'/g, "\\'")}', '${otStatusVal}')"`;
+
+                    html += `
+                <td ${cellAttrs} class="px-1 py-3 text-center whitespace-nowrap border-b border-r border-gray-200 text-sm font-medium ${dayAtt.check_in_time ? 'text-green-700 bg-green-50' : 'text-gray-300'}">${inTime}</td>
+                <td ${cellAttrs} class="px-1 py-3 text-center whitespace-nowrap border-b border-r border-gray-200 text-sm font-medium ${dayAtt.check_out_time ? 'text-red-600 bg-red-50' : 'text-gray-300'}">${outTime}</td>
+                <td ${cellAttrs} class="px-1 py-3 text-center whitespace-nowrap border-b border-r border-gray-200 text-sm">${lunchDisplay}</td>
+                <td ${cellAttrs} class="px-1 py-3 text-center whitespace-nowrap border-b border-r border-gray-200 text-sm">${otDisplay}</td>
+                <td ${cellAttrs} class="px-1 py-3 text-left whitespace-nowrap border-b border-r-4 border-black text-xs text-gray-500 italic truncate max-w-[100px]" title="${notesVal}">${notesVal}</td>
+                `;
+                }
+                html += `</tr>`;
+            });
+            tbody.innerHTML = html;
+            document.getElementById('showingText').innerText = `Showing ${data.length} Employees`;
+        }
+
+        function openEdit(empId, date, inTime, outTime, lunch, notes, otStatus) {
+            document.getElementById('editEmpId').value = empId;
+            document.getElementById('editDate').value = date;
+            document.getElementById('editCheckIn').value = inTime;
+            document.getElementById('editOut').value = outTime;
+            document.getElementById('editLunch').value = lunch;
+            document.getElementById('editNotes').value = notes;
+            document.getElementById('editOtStatus').value = otStatus || 'N/A';
+            document.getElementById('editReason').value = '';
+            document.getElementById('editModal').classList.remove('hidden');
+            document.getElementById('editModal').classList.add('flex');
+        }
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+            document.getElementById('editModal').classList.remove('flex');
+        }
+        async function saveAttendance() {
+            const empId = document.getElementById('editEmpId').value;
+            const date = document.getElementById('editDate').value;
+            const reason = document.getElementById('editReason').value;
+            if (!reason.trim()) { Toast.error('Reason required'); return; }
+
+            const body = {
+                date: date,
+                check_in_time: document.getElementById('editCheckIn').value || null,
+                check_out: document.getElementById('editOut').value || null,
+                lunch_duration: document.getElementById('editLunch').value,
+                notes: document.getElementById('editNotes').value,
+                overtime_status: document.getElementById('editOtStatus').value,
+                reason: reason
+            };
+
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`${API_BASE}/attendance/admin/${empId}`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                if (res.ok) { Toast.success('Saved'); closeEditModal(); fetchWeeklyData(); }
+                else { const d = await res.json(); Toast.error(d.message); }
+            } catch (e) { console.error(e); Toast.error('Error'); }
+        }
+
+        function toggleExportMenu() {
+            const menu = document.getElementById('exportMenu');
+            if (menu.classList.contains('hidden')) menu.classList.remove('hidden'); else menu.classList.add('hidden');
+        }
+
+        async function exportData(type) {
+            toggleExportMenu();
+            const token = localStorage.getItem('token');
+            // If week, use current start date logic? Or just server side 'current'.
+            // For now, simple calls.
+            const url = `${API_BASE}/attendance/admin/export?type=${type}&start_date=${currentStartDate.toISOString()}`; // Send current visual date for reference
+
+            try {
+                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (res.ok) {
+                    const blob = await res.blob();
+                    const u = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = u;
+                    a.download = `attendance_${type}.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    Toast.success('Export downloaded');
+                } else {
+                    Toast.error('Export failed');
+                }
+            } catch (e) { console.error(e); Toast.error('Error'); }
+        }
+
+        function changeWeek(offset) {
+            currentStartDate.setDate(currentStartDate.getDate() + (offset * 7));
+            renderHeader(); fetchWeeklyData();
+        }
+        function resetToCurrentWeek() {
+            currentStartDate = getMonday(new Date()); renderHeader(); fetchWeeklyData();
+        }
+
+        document.getElementById('searchInput').addEventListener('keyup', (e) => {
+            const term = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#attendanceBody tr');
+            rows.forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none';
+            });
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        });
+
+        init();
+    </script>
+</body>
+
+</html>

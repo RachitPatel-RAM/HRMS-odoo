@@ -7,29 +7,19 @@ const EmployeeCertification = require('../models/EmployeeCertification');
 const ProfileEditHistory = require('../models/ProfileEditHistory');
 const Attendance = require('../models/Attendance'); // Added
 const Leave = require('../models/Leave'); // Added
+const AuditLog = require('../models/AuditLog');
+const SalaryDetails = require('../models/SalaryDetails');
 
-async function sync() {
+const sync = async () => {
     try {
         await sequelize.authenticate();
-        console.log('Connection has been established successfully.');
+        console.log('DB Connection OK');
 
-        // Sync specific models to avoid issues with others
+        // Sync Models
+        // Use alter: true carefully. For new models, it's safer.
+        await Company.sync({ alter: true });
+        await User.sync({ alter: true });
         await Employee.sync({ alter: true });
-        console.log('Employee model synced.');
-
-        const BankDetail = require('../models/BankDetail');
-        await BankDetail.sync({ alter: true });
-        console.log('BankDetail model synced.');
-
-        await EmployeeSkill.sync({ alter: true });
-        console.log('EmployeeSkill model synced.');
-
-        await EmployeeCertification.sync({ alter: true });
-        console.log('EmployeeCertification model synced.');
-
-        const EmployeeSalary = require('../models/EmployeeSalary');
-        await EmployeeSalary.sync({ alter: true });
-        console.log('EmployeeSalary model synced.');
 
         const EmployeeExperience = require('../models/EmployeeExperience');
         await EmployeeExperience.sync({ alter: true });

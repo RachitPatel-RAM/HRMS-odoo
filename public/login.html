@@ -47,10 +47,14 @@
             </div>
 
             <div class="space-y-2">
-                <label class="block text-xl ml-1" for="email">Employee ID / Email :-</label>
-                <input
-                    class="w-full bg-white border-2 border-black rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder-gray-400 shadow-sm"
-                    id="email" name="email" placeholder="Employee ID or Email" type="text" required />
+                <label class="block text-xl font-bold mb-1">Email or Login ID</label>
+                <div class="relative">
+                    <span
+                        class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl">person</span>
+                    <input type="text" id="email" name="email"
+                        class="w-full pl-10 pr-4 py-3 border-2 border-black rounded-lg text-xl outline-none focus:ring-2 ring-primary transition-all shadow-sm focus:border-primary"
+                        placeholder="hr@company.com or OIHR..." required>
+                </div>
             </div>
             <div class="space-y-2">
                 <label class="block text-xl text-text-light pl-1" for="password">
@@ -60,8 +64,11 @@
                     <span
                         class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl">lock_outline</span>
                     <input
-                        class="w-full pl-10 pr-4 py-3 bg-white border-2 border-black rounded-lg text-lg text-text-light placeholder-gray-400 hand-input transition-all shadow-sm focus:border-primary"
+                        class="w-full pl-10 pr-12 py-3 bg-white border-2 border-black rounded-lg text-lg text-text-light placeholder-gray-400 hand-input transition-all shadow-sm focus:border-primary outline-none focus:ring-2 ring-primary"
                         id="password" name="password" placeholder="••••••••" type="password" required />
+                    <span id="togglePass"
+                        class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl cursor-pointer hover:text-primary select-none"
+                        onclick="togglePassword()">visibility</span>
                 </div>
             </div>
             <div class="pt-4">
@@ -93,10 +100,22 @@
             errorDiv.classList.remove('hidden');
         }
 
+        function togglePassword() {
+            const passInput = document.getElementById('password');
+            const icon = document.getElementById('togglePass');
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                icon.textContent = 'visibility_off';
+            } else {
+                passInput.type = 'password';
+                icon.textContent = 'visibility';
+            }
+        }
+
         // Auto-Redirect if logged in
         if (localStorage.getItem('token')) {
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            if (user.role === 'ADMIN' || user.role === 'HR') {
+            const role = localStorage.getItem('userRole');
+            if (role === 'ADMIN' || role === 'HR') {
                 window.location.href = '/admin-dashboard.html';
             } else {
                 window.location.href = '/dashboard.html';
@@ -123,9 +142,15 @@
                 if (response.ok) {
                     // Success 200
                     localStorage.setItem('token', result.token);
-                    localStorage.setItem('user', JSON.stringify(result.user));
+                    localStorage.setItem('userRole', result.user.role);
+                    localStorage.setItem('userName', result.user.name);
 
-                    if (result.user.role === 'ADMIN' || result.user.role === 'HR') {
+                    if (result.requirePasswordChange) {
+                        window.location.href = '/change_password.html';
+                        return;
+                    }
+
+                    if (['ADMIN', 'HR'].includes(result.user.role)) {
                         window.location.href = '/admin-dashboard.html';
                     } else {
                         window.location.href = '/dashboard.html';

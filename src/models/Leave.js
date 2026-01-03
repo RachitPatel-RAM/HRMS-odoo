@@ -17,15 +17,24 @@ const Leave = sequelize.define('Leave', {
         allowNull: false
     },
     type: {
-        type: DataTypes.STRING,
-        defaultValue: 'Annual'
+        type: DataTypes.ENUM('Paid Time Off', 'Sick Leave', 'Unpaid Leave', 'Maternity Leave'),
+        defaultValue: 'Paid Time Off'
+    },
+    days_count: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0
     },
     status: {
-        type: DataTypes.ENUM('PENDING', 'APPROVED', 'REJECTED'),
+        type: DataTypes.ENUM('PENDING', 'APPROVED', 'REJECTED', 'TAKEN'),
         defaultValue: 'PENDING'
     },
     reason: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    attachment_url: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
 }, {
     tableName: 'leaves',

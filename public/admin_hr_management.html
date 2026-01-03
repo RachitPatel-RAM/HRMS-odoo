@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>HR Management - HRMS</title>
+    <link href="/css/output.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&amp;display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="/js/toast.js"></script>
+
+    <style>
+        @font-face {
+            font-family: 'Gochi Hand';
+            src: url('/fonts/gochi.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'Gochi Hand', cursive;
+        }
+
+        .sketch-border {
+            border: 2px solid currentColor;
+            border-radius: 2px 5px 3px 6px;
+        }
+
+        .sketch-shadow {
+            box-shadow: 2px 3px 0px 0px rgba(0, 0, 0, 1);
+        }
+    </style>
+</head>
+
+<body class="bg-white text-gray-900 font-body min-h-screen flex flex-col transition-colors duration-200">
+
+    <!-- Header / Navbar -->
+    <header
+        class="sticky top-0 z-50 bg-white border-b-2 border-black px-6 py-2 flex justify-between items-center shadow-md relative">
+        <!-- Left: Logo -->
+        <div class="flex items-center gap-3">
+            <div class="flex items-center justify-center p-1">
+                <img src="/assets/logg_odooHRMS.png" alt="Odoo Logo" class="h-20 w-20 object-contain">
+            </div>
+        </div>
+
+        <!-- Center: Navigation -->
+        <nav class="hidden md:flex items-center gap-6 absolute left-1/2 transform -translate-x-1/2">
+            <a href="/admin-dashboard.html"
+                class="bg-white text-black px-6 py-2 text-xl font-bold border-2 border-black transform -rotate-1 shadow-[2px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all rounded-sm font-hand">
+                Employees
+            </a>
+            <a href="/admin_attendance.html"
+                class="bg-white text-black px-6 py-2 text-xl font-bold border-2 border-black transform rotate-1 shadow-[2px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:bg-gray-50 transition-all rounded-sm font-hand">
+                Attendance
+            </a>
+            <a href="/admin_timeoff.html"
+                class="bg-white text-black px-6 py-2 text-xl font-bold border-2 border-black transform -rotate-1 shadow-[2px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:bg-gray-50 transition-all rounded-sm font-hand">
+                Time Off
+            </a>
+            <!-- Active Tab -->
+            <a href="/admin_hr_management.html"
+                class="bg-primary text-white px-6 py-2 text-xl font-bold border-2 border-black transform rotate-1 shadow-[2px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:bg-purple-700 transition-all rounded-sm font-hand">
+                HR Management
+            </a>
+        </nav>
+
+        <!-- Right: Avatar -->
+        <div class="hidden md:flex items-center gap-4">
+            <button class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                <span class="material-icons-outlined text-2xl">notifications</span>
+            </button>
+            <div class="relative group">
+                <button
+                    class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border-2 border-black focus:outline-none focus:ring-2 focus:ring-primary">
+                    <img id="userAvatar" alt="User Avatar" class="w-full h-full object-cover"
+                        src="https://ui-avatars.com/api/?name=Admin&background=random" />
+                </button>
+                <div
+                    class="absolute right-0 mt-2 w-48 bg-white border-2 border-black rounded-md shadow-hand opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all transform origin-top-right z-50">
+                    <a class="block px-4 py-2 text-lg hover:bg-purple-100" href="/admin_profile.html">My Profile</a>
+                    <a id="logoutBtn" class="block px-4 py-2 text-lg hover:bg-purple-100 text-red-600" href="#">Log
+                        Out</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Stats Row -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+            <div class="bg-blue-50 p-6 border-2 border-black rounded shadow-sketch transform rotate-1">
+                <h3 class="text-2xl text-blue-800 font-bold mb-2">Total Employees</h3>
+                <p id="statEmployees" class="text-5xl font-bold text-black">--</p>
+                <span
+                    class="material-icons-outlined absolute top-4 right-4 text-6xl text-blue-200 opacity-50">people</span>
+            </div>
+            <div class="bg-purple-50 p-6 border-2 border-black rounded shadow-sketch transform -rotate-1">
+                <h3 class="text-2xl text-purple-800 font-bold mb-2">Total HR Admins</h3>
+                <p id="statHR" class="text-5xl font-bold text-black">--</p>
+                <span
+                    class="material-icons-outlined absolute top-4 right-4 text-6xl text-purple-200 opacity-50">admin_panel_settings</span>
+            </div>
+            <div class="bg-green-50 p-6 border-2 border-black rounded shadow-sketch transform rotate-1">
+                <h3 class="text-2xl text-green-800 font-bold mb-2">System Users</h3>
+                <p id="statUsers" class="text-5xl font-bold text-black">--</p>
+                <span
+                    class="material-icons-outlined absolute top-4 right-4 text-6xl text-green-200 opacity-50">account_circle</span>
+            </div>
+        </div>
+
+        <!-- Action Header -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <h1 class="text-4xl font-bold relative inline-block">
+                HR Accounts
+                <svg class="absolute w-full h-3 -bottom-2 left-0 text-primary" preserveAspectRatio="none"
+                    viewBox="0 0 100 10">
+                    <path d="M0 5 Q 50 10 100 5" fill="none" stroke="currentColor" stroke-width="3"></path>
+                </svg>
+            </h1>
+            <button onclick="openModal()"
+                class="bg-primary text-white px-6 py-2 text-xl font-bold border-2 border-black transform -rotate-1 shadow-[2px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all rounded-sm flex items-center gap-2 hover:bg-purple-700">
+                <span class="material-icons-outlined">add</span> Create New HR
+            </button>
+        </div>
+
+        <!-- Placeholder / List -->
+        <div class="bg-white border-2 border-black p-12 rounded-lg shadow-sketch text-center">
+            <div
+                class="bg-gray-100 h-24 w-24 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-black">
+                <span class="material-icons-outlined text-4xl text-gray-500">manage_accounts</span>
+            </div>
+            <h2 class="text-2xl font-bold mb-2">Manage Administrators</h2>
+            <p class="text-xl text-gray-600 mb-6">Create and manage HR accounts that have access to this dashboard.</p>
+            <button onclick="openModal(); return false;"
+                class="text-primary font-bold text-xl hover:underline cursor-pointer">
+                Onboard a new HR Manager &rarr;
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Create Modal -->
+    <!-- Create Modal -->
+    <div id="modal"
+        class="fixed inset-0 w-full h-full bg-black bg-opacity-50 hidden items-center justify-center z-[100]">
+        <div
+            class="bg-white p-8 rounded-lg border-2 border-black shadow-sketch max-w-md w-full transform rotate-1 relative">
+            <button onclick="closeModal()" class="absolute top-4 right-4 p-1 hover:bg-gray-100 rounded-full transition">
+                <span class="material-icons-outlined text-2xl">close</span>
+            </button>
+            <h2 class="text-3xl font-bold mb-6 text-center text-primary">Onboard HR</h2>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xl font-bold mb-1">Email <span class="text-red-500">*</span></label>
+                    <input id="hrEmail" type="email"
+                        class="w-full border-2 border-black p-2 rounded text-xl focus:ring-2 focus:ring-primary outline-none"
+                        placeholder="hr@company.com">
+                </div>
+                <div>
+                    <label class="block text-xl font-bold mb-1">First Name</label>
+                    <input id="hrFirst" type="text"
+                        class="w-full border-2 border-black p-2 rounded text-xl focus:ring-2 focus:ring-primary outline-none"
+                        placeholder="John">
+                </div>
+                <div>
+                    <label class="block text-xl font-bold mb-1">Last Name</label>
+                    <input id="hrLast" type="text"
+                        class="w-full border-2 border-black p-2 rounded text-xl focus:ring-2 focus:ring-primary outline-none"
+                        placeholder="Doe">
+                </div>
+            </div>
+
+            <button onclick="createHR()"
+                class="w-full bg-primary text-white text-xl font-bold border-2 border-black py-3 mt-8 shadow-sketch hover:shadow-none hover:translate-y-1 transition-all rounded">
+                Create Account
+            </button>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-8 border-2 border-black rounded shadow-sketch max-w-md w-full text-center relative">
+            <div
+                class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-black">
+                <span class="material-icons-outlined text-3xl">check</span>
+            </div>
+            <h2 class="text-3xl font-bold text-green-600 mb-2">Success!</h2>
+            <p class="text-xl mb-6">HR Account Created Successfully.</p>
+
+            <div class="bg-gray-50 p-4 border-2 border-dashed border-black rounded mb-6 text-left">
+                <p class="font-bold">Login ID: <span id="resId" class="text-primary font-mono ml-2"></span></p>
+                <p class="font-bold">Email: <span id="resEmail" class="text-gray-700 font-mono ml-2"></span></p>
+            </div>
+
+            <button onclick="closeSuccess()"
+                class="bg-black text-white px-8 py-2 text-xl font-bold rounded hover:bg-gray-800 transition">Done</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+
+        async function init() {
+            const token = localStorage.getItem('token');
+            if (!token) window.location.href = '/login.html';
+
+            try {
+                // Auth Check
+                const meRes = await fetch(`${API_BASE}/dashboard`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (meRes.ok) {
+                    const meData = await meRes.json();
+                    document.getElementById('userAvatar').src = meData.me.profile_picture || `https://ui-avatars.com/api/?name=${meData.me.first_name}`;
+                    if (!['ADMIN', 'HR'].includes(meData.me.role)) {
+                        window.location.href = '/dashboard.html';
+                    }
+                }
+
+                // Stats
+                const statsRes = await fetch(`${API_BASE}/admin/stats`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await statsRes.json();
+                if (statsRes.ok) {
+                    document.getElementById('statEmployees').innerText = data.employees;
+                    document.getElementById('statHR').innerText = data.hrs;
+                    document.getElementById('statUsers').innerText = data.total_users;
+                }
+            } catch (e) {
+                console.error("Auth Fail", e);
+                const current = window.location.pathname;
+                if (!current.includes('login')) {
+                    localStorage.removeItem('token');
+                    window.location.href = '/login.html';
+                }
+            }
+        }
+
+        function openModal() { document.getElementById('modal').classList.remove('hidden'); document.getElementById('modal').classList.add('flex'); }
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); document.getElementById('modal').classList.remove('flex'); }
+        function closeSuccess() { document.getElementById('successModal').classList.add('hidden'); document.getElementById('successModal').classList.remove('flex'); }
+
+        async function createHR() {
+            const email = document.getElementById('hrEmail').value;
+            const token = localStorage.getItem('token');
+
+            if (!email) { Toast.error('Email is required'); return; }
+
+            try {
+                const res = await fetch(`${API_BASE}/auth/create-hr`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: email,
+                        first_name: document.getElementById('hrFirst').value,
+                        last_name: document.getElementById('hrLast').value
+                    })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    closeModal();
+                    document.getElementById('resId').innerText = data.loginId;
+                    document.getElementById('resEmail').innerText = data.email;
+                    document.getElementById('successModal').classList.remove('hidden');
+                    document.getElementById('successModal').classList.add('flex');
+                    Toast.success('HR Account Created');
+                } else {
+                    Toast.error(data.message);
+                }
+            } catch (e) { console.error(e); Toast.error('Error'); }
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        });
+
+        init();
+    </script>
+</body>
+
+</html>
